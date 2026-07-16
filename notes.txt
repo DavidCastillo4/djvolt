@@ -1,0 +1,96 @@
+/*pending script
+ALTER TABLE pending ADD CONSTRAINT uxConDateSlot UNIQUE (date, slot);
+drop TABLE reservation;
+drop TABLE reservationLog;
+
+drop TABLE reservation;
+drop TABLE reservationLog;
+drop TABLE settings;
+*/
+drop TABLE reservation;
+drop TABLE reservationLog;
+drop TABLE settings;
+
+
+CREATE TABLE reservation (
+reservationPk INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1001 INCREMENT BY 1) PRIMARY KEY,
+date             DATE NULL,
+slot             VARCHAR(2) NULL CHECK (Slot IN ('am', 'pm')),
+firstName varchar(100) null,
+lastName varchar(100) null,
+mobile           VARCHAR(20) NULL,
+email            VARCHAR(255) NULL,
+Address1 varchar(500) NULL,
+notes varchar(5000) null,
+entryCode varchar(25) null,
+entryCodeSentDateTime TIMESTAMP null,
+homeOwner BOOLEAN null,
+status varchar(50) NULL,
+residentMessage varchar(5000) null,
+adminNotes varchar(5000),
+hashId varchar(200),
+lastModifiedUser varchar(100) null,
+lastModifiedDateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX ixDateSlot ON reservation (date, slot);
+ALTER TABLE reservation ADD CONSTRAINT uxConDateSlot UNIQUE (date, slot);
+
+CREATE TABLE reservationLog (
+Pk INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY,
+IUD varchar(50) null,
+reservationPk INTEGER null,
+date             DATE NULL,
+slot             VARCHAR(2) NULL,
+firstName varchar(100) null,
+lastName varchar(100) null,
+mobile           VARCHAR(20) NULL,
+email            VARCHAR(255) NULL,
+Address1 varchar(500) NULL,
+notes varchar(5000) null,
+entryCode varchar(25) null,
+entryCodeSentDateTime TIMESTAMP null,
+homeOwner BOOLEAN null,
+status varchar(50) NULL,
+residentMessage varchar(5000),
+adminNotes varchar(5000),
+hashId varchar(200),
+lastModifiedUser varchar(100) null,
+lastModifiedDateTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+create table settings (
+pk INTEGER GENERATED ALWAYS AS IDENTITY (START WITH 1 INCREMENT BY 1) PRIMARY KEY,
+  dashboardPassword varchar(50) null,
+  adminEmail varchar(50) NULL,
+  adminMobile varchar(20) NULL,
+  wifiName varchar(100) null,
+  wifiPassword varchar(100) null,
+  trashCode varchar(100) null,
+  devModePassword varchar(100) null,
+  forwardAdminEmail BOOLEAN null,
+  forwardAdminMobile BOOLEAN null,
+  enableGoogleCalendarUpdate BOOLEAN null
+);
+
+insert into settings 
+  (
+  dashboardPassword, 
+  adminEmail,
+  adminMobile ,
+  wifiName,
+  wifiPassword,
+  trashCode,
+  devModePassword,
+  forwardAdminEmail,  
+  forwardAdminMobile,
+  enableGoogleCalendarUpdate
+  )
+select 'vosh78748','david.castillo4@outlook.com','5127497744','VOSH','gatlinggun','8774 (TRSH)','Jworg1914v',FALSE,FALSE,FALSE;
+
+
+
+
+
+
+https://vosh.vercel.app/
