@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-const AUTO_SCROLL_SPEED = 0.35;
+const AUTO_SCROLL_PIXELS_PER_SECOND = 18;
 
 const MediaCard = ({ item, itemKey, onOpen, shouldPlay }) => {
  const videoRef = useRef(null);
@@ -71,12 +71,14 @@ export const Gallery = ({ mediaItems }) => {
  const [isPageVisible, setIsPageVisible] = useState(true);
  const trackRef = useRef(null);
  const animationRef = useRef(null);
+ const resumeTimerRef = useRef(null);
+ const lastFrameTimeRef = useRef(null);
  const closeButtonRef = useRef(null);
  const touchStart = useRef({ x: 0, y: 0 });
 
- const repeatedItems = useMemo(() => {
-  if (mediaItems.length <= 1) return mediaItems;
-  return [...mediaItems, ...mediaItems, ...mediaItems];
+ const repeatedSets = useMemo(() => {
+  if (mediaItems.length <= 1) return [mediaItems];
+  return [mediaItems, mediaItems, mediaItems];
  }, [mediaItems]);
 
  const selectedItem = selectedIndex === null ? null : mediaItems[selectedIndex];
@@ -95,11 +97,13 @@ export const Gallery = ({ mediaItems }) => {
   if (!track || mediaItems.length <= 1) return undefined;
 
   const positionAtMiddleSet = () => {
-   const setWidth = track.scrollWidth / 3;
+   const firstSet = track.querySelector('.media-gallery-set');
+   if (!firstSet) return;
+   const setWidth = firstSet.getBoundingClientRect().width + 16;
    if (setWidth > 0) track.scrollLeft = setWidth;
   };
 
-  const initialTimer = window.setTimeout(positionAtMiddleSet, 0);
+  const initialTimer = window.setTimeout(positionAtMiddleSet, 50);
   window.addEventListener('resize', positionAtMiddleSet);
 
   return () => {
@@ -110,42 +114,76 @@ export const Gallery = ({ mediaItems }) => {
 
  useEffect(() => {
   const track = trackRef.current;
-  if (!track || mediaItems.length <= 1 || isInteracting || selectedIndex !== null) return undefined;
+  if (!track || mediaItems.length <= 1 || isInteracting || selectedIndex !== null) {
+   lastFrameTimeRef.current = null;
+   return undefined;
+  }
 
-  const animate = () => {
-   const setWidth = track.scrollWidth / 3;
+  const animate = (timestamp) => {
+   const firstSet = track.querySelector('.media-gallery-set');
+   if (!firstSet) {
+    animationRef.current = window.requestAnimationFrame(animate);
+    return;
+   }
+
+   const setWidth = firstSet.getBoundingClientRect().width + 16;
+   const previousTimestamp = lastFrameTimeRef.current ?? timestamp;
+   const elapsedSeconds = Math.min((timestamp - previousTimestamp) / 1000, 0.05);
+   lastFrameTimeRef.current = timestamp;
+
    if (setWidth > 0) {
-    track.scrollLeft += AUTO_SCROLL_SPEED;
+    track.scrollLeft += AUTO_SCROLL_PIXELS_PER_SECOND * elapsedSeconds;
     if (track.scrollLeft >= setWidth * 2) track.scrollLeft -= setWidth;
    }
+
    animationRef.current = window.requestAnimationFrame(animate);
   };
 
   animationRef.current = window.requestAnimationFrame(animate);
-  return () => window.cancelAnimationFrame(animationRef.current);
+  return () => {
+   window.cancelAnimationFrame(animationRef.current);
+   lastFrameTimeRef.current = null;
+  };
  }, [isInteracting, mediaItems.length, selectedIndex]);
+
+ const getSetWidth = () => {
+  const track = trackRef.current;
+  const firstSet = track?.querySelector('.media-gallery-set');
+  if (!track || !firstSet) return 0;
+  return firstSet.getBoundingClientRect().width + 16;
+ };
 
  const maintainEndlessLoop = () => {
   const track = trackRef.current;
   if (!track || mediaItems.length <= 1) return;
 
-  const setWidth = track.scrollWidth / 3;
+  const setWidth = getSetWidth();
   if (setWidth <= 0) return;
 
-  if (track.scrollLeft < setWidth * 0.25) {
+  if (track.scrollLeft < setWidth * 0.5) {
    track.scrollLeft += setWidth;
-  } else if (track.scrollLeft > setWidth * 2.75) {
+  } else if (track.scrollLeft >= setWidth * 2.5) {
    track.scrollLeft -= setWidth;
   }
+ };
+
+ const pauseThenResume = () => {
+  setIsInteracting(true);
+  window.clearTimeout(resumeTimerRef.current);
+  resumeTimerRef.current = window.setTimeout(() => setIsInteracting(false), 1400);
  };
 
  const nudgeGallery = (direction) => {
   const track = trackRef.current;
   if (!track) return;
+
+  pauseThenResume();
   const card = track.querySelector('.media-card');
   const distance = card ? card.getBoundingClientRect().width + 16 : 340;
   track.scrollBy({ left: distance * direction, behavior: 'smooth' });
  };
+
+ useEffect(() => () => window.clearTimeout(resumeTimerRef.current), []);
 
  const closeViewer = () => setSelectedIndex(null);
 
@@ -224,14 +262,18 @@ export const Gallery = ({ mediaItems }) => {
          if (!event.currentTarget.contains(event.relatedTarget)) setIsInteracting(false);
         }}
        >
-        {repeatedItems.map((item, index) => (
-         <MediaCard
-          key={`${item.key}-${index}`}
-          item={item}
-          itemKey={`${item.key}-${index}`}
-          onOpen={openItem}
-          shouldPlay={shouldPlayInline}
-         />
+        {repeatedSets.map((setItems, setIndex) => (
+         <div className="media-gallery-set" key={`gallery-set-${setIndex}`}>
+          {setItems.map((item, itemIndex) => (
+           <MediaCard
+            key={`${item.key}-${setIndex}-${itemIndex}`}
+            item={item}
+            itemKey={`${item.key}-${setIndex}-${itemIndex}`}
+            onOpen={openItem}
+            shouldPlay={shouldPlayInline}
+           />
+          ))}
+         </div>
         ))}
        </div>
        {mediaItems.length > 1 && <button type="button" className="media-gallery-arrow media-gallery-next" onClick={() => nudgeGallery(1)} aria-label="Scroll gallery right">›</button>}
