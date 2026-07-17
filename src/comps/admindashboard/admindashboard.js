@@ -15,9 +15,10 @@ const formatBytes = (bytes) => {
 export const AdminDashboard = () => {
  const [activeTab, setActiveTab] = useState('dashboard');
  const [selectedFiles, setSelectedFiles] = useState([]);
- const [uploadedImages, setUploadedImages] = useState([]);
- const [isLoadingImages, setIsLoadingImages] = useState(true);
+ const [uploadedVideos, setUploadedVideos] = useState([]);
+ const [isLoadingVideos, setIsLoadingVideos] = useState(true);
  const [isUploading, setIsUploading] = useState(false);
+ const [uploadProgress, setUploadProgress] = useState('');
  const [message, setMessage] = useState('');
  const [error, setError] = useState('');
  const fileInputRef = useRef(null);
@@ -27,27 +28,27 @@ export const AdminDashboard = () => {
   [selectedFiles],
  );
 
- const loadImages = async () => {
-  setIsLoadingImages(true);
+ const loadVideos = async () => {
+  setIsLoadingVideos(true);
 
   try {
-   const response = await fetch('/api/admin/images', { cache: 'no-store' });
+   const response = await fetch('/api/admin/videos', { cache: 'no-store' });
    const data = await response.json();
 
    if (!response.ok) {
-    throw new Error(data.message || 'Unable to load uploaded images.');
+    throw new Error(data.message || 'Unable to load uploaded videos.');
    }
 
-   setUploadedImages(data.images || []);
+   setUploadedVideos(data.videos || []);
   } catch (loadError) {
    setError(loadError.message);
   } finally {
-   setIsLoadingImages(false);
+   setIsLoadingVideos(false);
   }
  };
 
  useEffect(() => {
-  loadImages();
+  loadVideos();
  }, []);
 
  const handleFileSelection = (event) => {
@@ -55,47 +56,61 @@ export const AdminDashboard = () => {
   setSelectedFiles(files);
   setMessage('');
   setError('');
+  setUploadProgress('');
  };
 
  const clearSelection = () => {
   setSelectedFiles([]);
-  setMessage('');
-  setError('');
+  setUploadProgress('');
 
   if (fileInputRef.current) {
    fileInputRef.current.value = '';
   }
  };
 
- const uploadImages = async () => {
+ const uploadVideos = async () => {
   if (selectedFiles.length === 0 || isUploading) return;
 
   setIsUploading(true);
   setMessage('');
   setError('');
 
+  let uploadedCount = 0;
+
   try {
-   const formData = new FormData();
-   selectedFiles.forEach((file) => formData.append('images', file));
+   for (let index = 0; index < selectedFiles.length; index += 1) {
+    const file = selectedFiles[index];
+    setUploadProgress(`Uploading ${index + 1} of ${selectedFiles.length}: ${file.name}`);
 
-   const response = await fetch('/api/admin/images', {
-    method: 'POST',
-    body: formData,
-   });
-   const data = await response.json();
+    const formData = new FormData();
+    formData.append('video', file);
 
-   if (!response.ok) {
-    throw new Error(data.message || 'Unable to upload the selected images.');
+    const response = await fetch('/api/admin/videos', {
+     method: 'POST',
+     body: formData,
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+     throw new Error(data.message || `Unable to upload ${file.name}.`);
+    }
+
+    uploadedCount += 1;
    }
 
-   setMessage(data.message);
    clearSelection();
-   setMessage(data.message);
-   await loadImages();
+   setMessage(`${uploadedCount} video${uploadedCount === 1 ? '' : 's'} uploaded successfully.`);
+   await loadVideos();
   } catch (uploadError) {
-   setError(uploadError.message);
+   setError(
+    uploadedCount > 0
+     ? `${uploadedCount} video${uploadedCount === 1 ? '' : 's'} uploaded before the error. ${uploadError.message}`
+     : uploadError.message,
+   );
+   await loadVideos();
   } finally {
    setIsUploading(false);
+   setUploadProgress('');
   }
  };
 
@@ -128,30 +143,30 @@ export const AdminDashboard = () => {
        <div className="admin-image-upload-heading">
         <div>
          <span className="admin-kicker">One-Time Database Load</span>
-         <h2>Upload Gallery Images</h2>
+         <h2>Upload Website Videos</h2>
          <p>
-          Select the gallery images you want stored in Neon. They will be inserted in the
-          order shown below and assigned sort values in increments of 10.
+          Select the videos you want stored in Neon. Videos are uploaded one at a time
+          in the order shown below and assigned sort values in increments of 10.
          </p>
         </div>
         <div className="admin-image-count">
-         <strong>{uploadedImages.length}</strong>
+         <strong>{uploadedVideos.length}</strong>
          <span>currently in database</span>
         </div>
        </div>
 
        <div className="admin-image-picker">
-        <label htmlFor="admin-image-files">Choose images</label>
+        <label htmlFor="admin-video-files">Choose videos</label>
         <input
          ref={fileInputRef}
-         id="admin-image-files"
+         id="admin-video-files"
          type="file"
-         accept="image/jpeg,image/png,image/webp,image/gif"
+         accept="video/mp4,video/webm,video/quicktime"
          multiple
          onChange={handleFileSelection}
          disabled={isUploading}
         />
-        <p>JPG, PNG, WebP, or GIF. Maximum 10 MB per image and 100 images per upload.</p>
+        <p>MP4, WebM, or MOV. Maximum 25 MB per video. Files upload sequentially.</p>
        </div>
 
        {selectedFiles.length > 0 && (
@@ -159,7 +174,7 @@ export const AdminDashboard = () => {
          <div className="admin-selected-images-header">
           <div>
            <h3>Ready to upload</h3>
-           <p>{selectedFiles.length} image{selectedFiles.length === 1 ? '' : 's'} · {formatBytes(totalSelectedSize)}</p>
+           <p>{selectedFiles.length} video{selectedFiles.length === 1 ? '' : 's'} · {formatBytes(totalSelectedSize)}</p>
           </div>
           <button type="button" className="admin-secondary-button" onClick={clearSelection} disabled={isUploading}>
            Clear
@@ -179,11 +194,13 @@ export const AdminDashboard = () => {
          <button
           type="button"
           className="admin-upload-button"
-          onClick={uploadImages}
+          onClick={uploadVideos}
           disabled={isUploading}
          >
-          {isUploading ? 'Uploading images…' : `Upload ${selectedFiles.length} image${selectedFiles.length === 1 ? '' : 's'} to Neon`}
+          {isUploading ? 'Uploading videos…' : `Upload ${selectedFiles.length} video${selectedFiles.length === 1 ? '' : 's'} to Neon`}
          </button>
+
+         {uploadProgress && <p className="admin-image-empty">{uploadProgress}</p>}
         </div>
        )}
 
@@ -193,38 +210,38 @@ export const AdminDashboard = () => {
        <div className="admin-database-images">
         <div className="admin-database-images-header">
          <div>
-          <h3>Images currently stored</h3>
-          <p>This list reads metadata only; it does not download the image data.</p>
+          <h3>Videos currently stored</h3>
+          <p>This list reads metadata only; it does not download the video data.</p>
          </div>
-         <button type="button" className="admin-secondary-button" onClick={loadImages} disabled={isLoadingImages || isUploading}>
+         <button type="button" className="admin-secondary-button" onClick={loadVideos} disabled={isLoadingVideos || isUploading}>
           Refresh
          </button>
         </div>
 
-        {isLoadingImages ? (
-         <p className="admin-image-empty">Loading database images…</p>
-        ) : uploadedImages.length === 0 ? (
-         <p className="admin-image-empty">No images have been uploaded yet.</p>
+        {isLoadingVideos ? (
+         <p className="admin-image-empty">Loading database videos…</p>
+        ) : uploadedVideos.length === 0 ? (
+         <p className="admin-image-empty">No videos have been uploaded yet.</p>
         ) : (
          <div className="admin-image-table-wrap">
           <table className="admin-image-table">
            <thead>
             <tr>
              <th>ID</th>
-             <th>Image name</th>
+             <th>Video name</th>
              <th>Type</th>
              <th>Size</th>
              <th>Sort ID</th>
             </tr>
            </thead>
            <tbody>
-            {uploadedImages.map((image) => (
-             <tr key={image.imgpk}>
-              <td>{image.imgpk}</td>
-              <td>{image.imgname}</td>
-              <td>{image.imgtype}</td>
-              <td>{formatBytes(image.imagesize)}</td>
-              <td>{image.sortid}</td>
+            {uploadedVideos.map((video) => (
+             <tr key={video.vidpk}>
+              <td>{video.vidpk}</td>
+              <td>{video.vidname}</td>
+              <td>{video.vidtype}</td>
+              <td>{formatBytes(video.videosize)}</td>
+              <td>{video.sortid}</td>
              </tr>
             ))}
            </tbody>
