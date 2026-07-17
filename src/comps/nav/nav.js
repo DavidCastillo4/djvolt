@@ -2,8 +2,11 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 export const Navigation = () => {
+ const pathname = usePathname();
+
  useEffect(() => {
   const menuBtn = document.getElementById('menuBtn');
   const mobileMenu = document.getElementById('mobileMenu');
@@ -30,6 +33,8 @@ export const Navigation = () => {
    links.forEach((link) => link.removeEventListener('click', closeMenu));
   };
  }, []);
+
+ if (pathname.startsWith('/admin')) return null;
 
  return (
   <>

@@ -598,3 +598,168 @@
     .nameplate-grid div:nth-last-child(-n+2){border-bottom:1px solid var(--wood-line);}
     .nameplate-grid div:last-child{border-bottom:none;}
   }
+
+/* ---------- admin ---------- */
+.admin-login-page,
+.admin-dashboard-page{
+ min-height:calc(100vh - 173px);
+ padding:72px 28px;
+ background:
+  radial-gradient(circle at top, rgba(240,166,61,0.12), transparent 36%),
+  var(--ink);
+}
+
+.admin-login-page{
+ display:grid;
+ place-items:center;
+}
+
+.admin-login-card,
+.admin-dashboard-shell{
+ width:min(100%, 1100px);
+ border:1px solid var(--wood-line);
+ border-radius:8px;
+ background:var(--panel);
+ box-shadow:0 20px 50px rgba(0,0,0,0.35);
+}
+
+.admin-login-card{
+ max-width:430px;
+ padding:38px;
+}
+
+.admin-kicker{
+ display:block;
+ margin-bottom:8px;
+ color:var(--amber);
+ font-family:var(--mono);
+ font-size:0.76rem;
+ letter-spacing:2px;
+ text-transform:uppercase;
+}
+
+.admin-login-card h1,
+.admin-dashboard-header h1{
+ margin:0;
+ font-family:var(--head);
+ font-size:2rem;
+}
+
+.admin-login-card > p{
+ margin:10px 0 28px;
+ color:var(--cream-dim);
+}
+
+.admin-login-form{
+ display:grid;
+ gap:12px;
+}
+
+.admin-login-form label{
+ font-family:var(--head);
+ font-weight:600;
+ letter-spacing:0.6px;
+}
+
+.admin-login-form input{
+ width:100%;
+ padding:13px 14px;
+ border:1px solid var(--wood-line);
+ border-radius:4px;
+ outline:none;
+ background:var(--ink);
+ color:var(--cream);
+ font:inherit;
+}
+
+.admin-login-form input:focus{
+ border-color:var(--volt);
+ box-shadow:0 0 0 3px rgba(89,224,242,0.12);
+}
+
+.admin-login-form button,
+.admin-tabs button{
+ border:0;
+ cursor:pointer;
+ font-family:var(--head);
+ font-weight:600;
+ letter-spacing:1px;
+ text-transform:uppercase;
+}
+
+.admin-login-form button{
+ margin-top:6px;
+ padding:13px 18px;
+ border-radius:4px;
+ background:var(--volt);
+ color:#0c2226;
+}
+
+.admin-login-form button:disabled{
+ cursor:wait;
+ opacity:0.65;
+}
+
+.admin-login-error{
+ color:#ffd1c4;
+ font-size:0.92rem;
+}
+
+.admin-dashboard-shell{
+ margin:0 auto;
+ overflow:hidden;
+}
+
+.admin-dashboard-header{
+ padding:28px 32px;
+ border-bottom:1px solid var(--wood-line);
+}
+
+.admin-tabs{
+ display:flex;
+ gap:4px;
+ padding:0 24px;
+ border-bottom:1px solid var(--wood-line);
+ background:var(--panel-2);
+}
+
+.admin-tabs button{
+ padding:15px 18px 13px;
+ border-bottom:3px solid transparent;
+ background:transparent;
+ color:var(--cream-dim);
+}
+
+.admin-tabs button.active{
+ border-bottom-color:var(--amber);
+ color:var(--cream);
+}
+
+.admin-tab-content{
+ min-height:360px;
+ padding:32px;
+}
+
+.admin-placeholder{
+ min-height:296px;
+}
+
+.footer-brand{
+ text-decoration:none;
+}
+
+@media (max-width: 640px){
+ .admin-login-page,
+ .admin-dashboard-page{
+  padding:40px 16px;
+ }
+
+ .admin-login-card{
+  padding:28px 22px;
+ }
+
+ .admin-dashboard-header,
+ .admin-tab-content{
+  padding:24px 20px;
+ }
+}
