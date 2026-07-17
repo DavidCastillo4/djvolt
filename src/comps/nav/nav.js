@@ -5,24 +5,30 @@ import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 const THEMES = [
- { value: 'original', label: 'Original Workshop' },
- { value: 'electric-sunset', label: 'Electric Sunset' },
- { value: 'redline', label: 'Redline' },
- { value: 'gold-rush', label: 'Gold Rush' },
- { value: 'neon-night', label: 'Neon Night' },
- { value: 'purple-pulse', label: 'Purple Pulse' },
- { value: 'ice-voltage', label: 'Ice Voltage' },
+ { value: 'original', label: 'Original Workshop', logo: '/assets/logos/logo.png' },
+ { value: 'electric-sunset', label: 'Electric Sunset', logo: '/assets/logos/electricsunset.png' },
+ { value: 'redline', label: 'Redline', logo: '/assets/logos/redline.png' },
+ { value: 'gold-rush', label: 'Gold Rush', logo: '/assets/logos/goldrush.png' },
+ { value: 'neon-night', label: 'Neon Night', logo: '/assets/logos/neonnight.png' },
+ { value: 'purple-pulse', label: 'Purple Pulse', logo: '/assets/logos/purplepulse.png' },
+ { value: 'ice-voltage', label: 'Ice Voltage', logo: '/assets/logos/icevoltage.png' },
 ];
+
+const DEFAULT_THEME = THEMES[0];
 
 export const Navigation = () => {
  const pathname = usePathname();
- const [theme, setTheme] = useState('original');
+ const [theme, setTheme] = useState(DEFAULT_THEME.value);
 
 
  useEffect(() => {
-  const savedTheme = window.localStorage.getItem('dj-volts-theme') || 'original';
-  setTheme(savedTheme);
-  document.documentElement.dataset.theme = savedTheme;
+  const savedTheme = window.localStorage.getItem('dj-volts-theme');
+  const validTheme = THEMES.some((option) => option.value === savedTheme)
+   ? savedTheme
+   : DEFAULT_THEME.value;
+
+  setTheme(validTheme);
+  document.documentElement.dataset.theme = validTheme;
  }, []);
 
  const handleThemeChange = (event) => {
@@ -59,6 +65,8 @@ export const Navigation = () => {
   };
  }, []);
 
+ const activeTheme = THEMES.find((option) => option.value === theme) || DEFAULT_THEME;
+
  if (pathname.startsWith('/admin')) return null;
 
  return (
@@ -66,7 +74,7 @@ export const Navigation = () => {
    <header className="site">
     <nav>
      <a href="#top" className="brand">
-      <img src="assets/logos/logo.png" alt="DJ Volts logo" className="brand-logo" />
+      <img src={activeTheme.logo} alt={`${activeTheme.label} DJ Volts logo`} className="brand-logo" />
      </a>
      <ul className="navlinks">
       <li>

@@ -36,6 +36,7 @@
     --amber:#ffb000; --amber-rgb:255,176,0; --amber-soft:#ffd166;
     --hazard:#ff4d00; --volt:#ff7a00; --volt-rgb:255,122,0; --volt-dim:#b83d00;
     --danger:#ff3b20;
+    --logo-orange:#ff9d26; --logo-red:#ff1f67;
   }
   :root[data-theme="redline"]{
     --ink:#100809; --ink-rgb:16,8,9;
@@ -44,6 +45,7 @@
     --amber:#ff8a00; --amber-rgb:255,138,0; --amber-soft:#ffbd59;
     --hazard:#ff2d20; --volt:#ff4d3d; --volt-rgb:255,77,61; --volt-dim:#a91f20;
     --danger:#ff3126;
+    --logo-orange:#ff3a32; --logo-red:#d90016;
   }
   :root[data-theme="gold-rush"]{
     --ink:#12100a; --ink-rgb:18,16,10;
@@ -52,6 +54,7 @@
     --amber:#ffc400; --amber-rgb:255,196,0; --amber-soft:#ffe175;
     --hazard:#ef6c00; --volt:#ffd84d; --volt-rgb:255,216,77; --volt-dim:#a87900;
     --danger:#e95522;
+    --logo-orange:#ffe056; --logo-red:#d99200;
   }
   :root[data-theme="neon-night"]{
     --ink:#080b10; --ink-rgb:8,11,16;
@@ -60,6 +63,7 @@
     --amber:#ff9a1f; --amber-rgb:255,154,31; --amber-soft:#ffc067;
     --hazard:#ff5a1f; --volt:#18e0ff; --volt-rgb:24,224,255; --volt-dim:#087f9b;
     --danger:#ff5364;
+    --logo-orange:#21e6ff; --logo-red:#006ee6;
   }
   :root[data-theme="purple-pulse"]{
     --ink:#0e0914; --ink-rgb:14,9,20;
@@ -68,6 +72,7 @@
     --amber:#ff9b2f; --amber-rgb:255,155,47; --amber-soft:#ffc36d;
     --hazard:#ff5b21; --volt:#d95cff; --volt-rgb:217,92,255; --volt-dim:#7f279d;
     --danger:#ff4c73;
+    --logo-orange:#d95cff; --logo-red:#7a13d8;
   }
   :root[data-theme="ice-voltage"]{
     --ink:#071014; --ink-rgb:7,16,20;
@@ -76,6 +81,7 @@
     --amber:#ff9e24; --amber-rgb:255,158,36; --amber-soft:#ffc76b;
     --hazard:#ff6024; --volt:#7df5ff; --volt-rgb:125,245,255; --volt-dim:#2597a3;
     --danger:#ff5360;
+    --logo-orange:#f5fdff; --logo-red:#77c9f2;
   }
 
   *{box-sizing:border-box;}
