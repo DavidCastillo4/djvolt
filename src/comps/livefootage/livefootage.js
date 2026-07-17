@@ -12,13 +12,14 @@ export const LiveFootage = ({ videos }) => {
   if (currentIndex >= videoCount) setCurrentIndex(0);
  }, [currentIndex, videoCount]);
 
- useEffect(() => {
-  if (!videoRef.current) return;
-  videoRef.current.load();
- }, [currentVideo?.src]);
-
  const changeVideo = (direction) => {
   if (videoCount <= 1) return;
+
+  if (videoRef.current) {
+   videoRef.current.pause();
+   videoRef.current.currentTime = 0;
+  }
+
   setCurrentIndex((index) => (index + direction + videoCount) % videoCount);
  };
 
@@ -28,12 +29,16 @@ export const LiveFootage = ({ videos }) => {
     <div className="reel-video">
      {currentVideo ? (
       <video
+       key={currentVideo.id}
        ref={videoRef}
-       src={currentVideo.src}
        controls
        playsInline
+       preload="metadata"
        poster="/assets/images/dance.jpg"
-      />
+       aria-label={currentVideo.name || 'Live footage video'}
+      >
+       <source src={currentVideo.src} type="video/mp4" />
+      </video>
      ) : (
       <div className="reel-video-empty">Live footage is coming soon.</div>
      )}
