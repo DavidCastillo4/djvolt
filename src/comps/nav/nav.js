@@ -1,8 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { useEffect } from 'react';
-
-const navigationMarkup = '<div class="hazard"></div>\n\n<header class="site">\n  <nav>\n    <a href="#top" class="brand"><img src="assets/logos/logo.png" alt="DJ Volts logo" class="brand-logo"></a>\n    <ul class="navlinks">\n      <li><a href="#about">About</a></li>\n      <li><a href="#services">Services</a></li>\n      <li><a href="#gallery">Gallery</a></li>\n      <li><a href="#reel">The Reel</a></li>\n      <li><a href="#book">Book</a></li>\n    </ul>\n    <a href="#book" class="nav-cta">Get a Quote</a>\n    <button class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">☰</button>\n  </nav>\n  <ul class="navlinks mobile-menu" id="mobileMenu">\n    <li><a href="#about">About</a></li>\n    <li><a href="#services">Services</a></li>\n    <li><a href="#gallery">Gallery</a></li>\n    <li><a href="#reel">The Reel</a></li>\n    <li><a href="#book">Book</a></li>\n  </ul>\n</header>';
 
 export const Navigation = () => {
  useEffect(() => {
@@ -32,5 +31,51 @@ export const Navigation = () => {
   };
  }, []);
 
- return <div style={{ display: 'contents' }} dangerouslySetInnerHTML={{ __html: navigationMarkup }} />;
+ return (
+  <>
+   <header className="site">
+    <nav>
+     <a href="#top" className="brand">
+      <img src="assets/logos/logo.png" alt="DJ Volts logo" className="brand-logo" />
+     </a>
+     <ul className="navlinks">
+      <li>
+       <a href="#about">About</a>
+      </li>
+      <li>
+       <a href="#services">Services</a>
+      </li>
+      <li>
+       <a href="#gallery">Gallery</a>
+      </li>
+      <li>
+       <a href="#reel">The Reel</a>
+      </li>
+      <li>
+       <a href="#book">Book</a>
+      </li>
+     </ul>
+     <a href="#book" className="nav-cta">Get a Quote</a>
+     <button className="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
+    </nav>
+    <ul className="navlinks mobile-menu" id="mobileMenu">
+     <li>
+      <a href="#about">About</a>
+     </li>
+     <li>
+      <a href="#services">Services</a>
+     </li>
+     <li>
+      <a href="#gallery">Gallery</a>
+     </li>
+     <li>
+      <a href="#reel">The Reel</a>
+     </li>
+     <li>
+      <a href="#book">Book</a>
+     </li>
+    </ul>
+   </header>
+  </>
+ );
 };

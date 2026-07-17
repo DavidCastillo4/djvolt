@@ -302,6 +302,25 @@
     border:1px solid var(--wood-line);
     cursor:pointer;
   }
+  .gallery-page{animation:galleryPageIn .35s ease both;}
+  @keyframes galleryPageIn{
+    from{opacity:0; transform:translateY(8px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+  .gallery-controls{
+    display:flex; justify-content:center; gap:14px; margin-top:24px;
+  }
+  .gallery-controls button{
+    width:48px; height:48px; border-radius:50%;
+    border:1px solid var(--wood-line); background:var(--wood); color:var(--cream);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.8rem; line-height:1; cursor:pointer;
+    transition:border-color .2s ease, color .2s ease, transform .2s ease, background .2s ease;
+  }
+  .gallery-controls button:hover{
+    border-color:var(--amber); color:var(--amber); transform:translateY(-2px);
+  }
+  .gallery-controls button:focus-visible{outline:2px solid var(--volt); outline-offset:3px;}
   .gallery-grid figure:focus-visible{outline:2px solid var(--volt); outline-offset:3px;}
   .gallery-grid img{width:100%; height:100%; object-fit:cover; transition:transform .5s ease, filter .5s ease; filter:saturate(0.92);}
   .gallery-grid figure:hover img{transform:scale(1.06); filter:saturate(1.1);}
@@ -316,17 +335,6 @@
   .gallery-grid figure:hover .gallery-zoom{border-color:var(--amber); color:var(--amber);}
   @media (hover:none){
     .gallery-zoom{opacity:0.85; transform:scale(1);}
-  }
-  .gallery-grid figcaption{
-    position:absolute; left:0; right:0; bottom:0;
-    padding:10px 12px 8px;
-    background:linear-gradient(0deg, rgba(20,15,10,0.88), transparent);
-    font-family:var(--mono); font-size:0.68rem; letter-spacing:1px; text-transform:uppercase; color:var(--cream-dim);
-    opacity:0; transform:translateY(6px); transition:opacity .3s ease, transform .3s ease;
-  }
-  .gallery-grid figure:hover figcaption, .gallery-grid figure:focus-visible figcaption{opacity:1; transform:translateY(0);}
-  @media (hover:none){
-    .gallery-grid figcaption{opacity:1; transform:translateY(0);}
   }
   .g1{grid-column:span 2; grid-row:span 2;}
   .g2{grid-column:span 2;}
@@ -377,7 +385,7 @@
   .lightbox-prev:hover, .lightbox-next:hover{transform:translateY(-50%) translateY(-1px);}
   .lightbox-meta{
     width:100%; max-width:1100px;
-    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    display:flex; align-items:center; justify-content:flex-end; gap:16px;
     padding:14px 4px 0;
     font-family:var(--mono); font-size:0.75rem; letter-spacing:1px; text-transform:uppercase; color:var(--cream-dim);
   }
