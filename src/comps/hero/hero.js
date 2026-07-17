@@ -15,7 +15,7 @@ export const Hero = () => (
     <p className="tagline">Licensed electrician by day. Fully wired for a good time by night. Spanish, Country, top 40 and dance-floor classics, run by a guy who actually reads the dance floor.</p>
     <div className="hero-ctas">
      <a href="#book" className="btn btn-volt">⚡ Book The Power</a>
-     <a href="#reel" className="btn btn-ghost">Watch The Reel</a>
+     <a href="#gallery" className="btn btn-ghost">View The Gallery</a>
     </div>
     <div className="hero-specs">
      <div><b>250+</b>Events Wired</div>

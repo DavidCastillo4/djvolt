@@ -58,7 +58,6 @@ export const Navigation = () => {
      <li><a href={homeHref('#about')}>About</a></li>
      <li><a href={homeHref('#services')}>Services</a></li>
      <li><a href={homeHref('#gallery')}>Gallery</a></li>
-     <li><a href={homeHref('#reel')}>The Reel</a></li>
      <li><a href={homeHref('#book')}>Book</a></li>
     </ul>
 
@@ -88,7 +87,6 @@ export const Navigation = () => {
     <li><a href={homeHref('#about')} onClick={closeMenu}>About</a></li>
     <li><a href={homeHref('#services')} onClick={closeMenu}>Services</a></li>
     <li><a href={homeHref('#gallery')} onClick={closeMenu}>Gallery</a></li>
-    <li><a href={homeHref('#reel')} onClick={closeMenu}>The Reel</a></li>
     <li><a href={homeHref('#book')} onClick={closeMenu}>Book</a></li>
    </ul>
   </header>

@@ -3,48 +3,38 @@ import { getDatabase } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
-async function getGalleryImages() {
+async function getGalleryMedia() {
  try {
   const sql = getDatabase();
-  const images = await sql`
-   SELECT imgpk
+  const media = await sql`
+   SELECT imgpk AS id, imgname AS name, 'image' AS type, sortid
    FROM img
-   ORDER BY sortid, imgpk
-  `;
 
-  return images.map((image) => `/api/images/${image.imgpk}`);
- } catch (error) {
-  console.error('Unable to load gallery images from the database:', error);
-  return [];
- }
-}
+   UNION ALL
 
-async function getLiveFootageVideos() {
- try {
-  const sql = getDatabase();
-  const videos = await sql`
-   SELECT vidpk, vidname
+   SELECT vidpk AS id, vidname AS name, 'video' AS type, sortid
    FROM vid
    WHERE islivefootage = TRUE
-   ORDER BY sortid, vidpk
+
+   ORDER BY sortid, type, id
   `;
 
-  return videos.map((video) => ({
-   id: video.vidpk,
-   name: video.vidname,
-   src: `/api/videos/id/${video.vidpk}`,
+  return media.map((item) => ({
+   key: `${item.type}-${item.id}`,
+   id: item.id,
+   name: item.name,
+   type: item.type,
+   src: item.type === 'video'
+    ? `/api/videos/id/${item.id}`
+    : `/api/images/${item.id}`,
   }));
  } catch (error) {
-  console.error('Unable to load live footage videos from the database:', error);
+  console.error('Unable to load gallery media from the database:', error);
   return [];
  }
 }
 
 export default async function Home() {
- const [galleryImages, liveFootageVideos] = await Promise.all([
-  getGalleryImages(),
-  getLiveFootageVideos(),
- ]);
-
- return <Djvolts galleryImages={galleryImages} liveFootageVideos={liveFootageVideos} />;
+ const galleryMedia = await getGalleryMedia();
+ return <Djvolts galleryMedia={galleryMedia} />;
 }
