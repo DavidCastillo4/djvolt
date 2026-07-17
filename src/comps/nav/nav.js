@@ -67,30 +67,31 @@ export const Navigation = () => {
 
  const activeTheme = THEMES.find((option) => option.value === theme) || DEFAULT_THEME;
 
- if (pathname.startsWith('/admin')) return null;
+ const isAdminRoute = pathname.startsWith('/admin');
+ const homeHref = (section = '') => isAdminRoute ? `/${section}` : section;
 
  return (
   <>
    <header className="site">
     <nav>
-     <a href="#top" className="brand">
+     <a href={homeHref('#top')} className="brand">
       <img src={activeTheme.logo} alt={`${activeTheme.label} DJ Volts logo`} className="brand-logo" />
      </a>
      <ul className="navlinks">
       <li>
-       <a href="#about">About</a>
+       <a href={homeHref('#about')}>About</a>
       </li>
       <li>
-       <a href="#services">Services</a>
+       <a href={homeHref('#services')}>Services</a>
       </li>
       <li>
-       <a href="#gallery">Gallery</a>
+       <a href={homeHref('#gallery')}>Gallery</a>
       </li>
       <li>
-       <a href="#reel">The Reel</a>
+       <a href={homeHref('#reel')}>The Reel</a>
       </li>
       <li>
-       <a href="#book">Book</a>
+       <a href={homeHref('#book')}>Book</a>
       </li>
      </ul>
      <label className="theme-picker">
@@ -101,24 +102,24 @@ export const Navigation = () => {
        ))}
       </select>
      </label>
-     <a href="#book" className="nav-cta">Get a Quote</a>
+     <a href={homeHref('#book')} className="nav-cta">Get a Quote</a>
      <button className="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
     </nav>
     <ul className="navlinks mobile-menu" id="mobileMenu">
      <li>
-      <a href="#about">About</a>
+      <a href={homeHref('#about')}>About</a>
      </li>
      <li>
-      <a href="#services">Services</a>
+      <a href={homeHref('#services')}>Services</a>
      </li>
      <li>
-      <a href="#gallery">Gallery</a>
+      <a href={homeHref('#gallery')}>Gallery</a>
      </li>
      <li>
-      <a href="#reel">The Reel</a>
+      <a href={homeHref('#reel')}>The Reel</a>
      </li>
      <li>
-      <a href="#book">Book</a>
+      <a href={homeHref('#book')}>Book</a>
      </li>
     </ul>
    </header>
