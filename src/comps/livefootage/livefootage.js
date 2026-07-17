@@ -59,29 +59,31 @@ export const LiveFootage = ({ videos }) => {
   <section className="reel" id="reel">
    <div className="wrap reel-grid">
     <div className="reel-video">
-     {currentVideo ? (
-      <>
-       <video
-        key={currentVideo.id}
-        ref={videoRef}
-        src={currentVideo.src}
-        controls
-        playsInline
-        preload="auto"
-        aria-label={currentVideo.name || 'Live footage video'}
-        onLoadedData={showFirstFrame}
-        onCanPlay={showFirstFrame}
-        onError={() => setIsLoading(false)}
-       />
-       {isLoading && (
-        <div className="reel-video-loading" aria-live="polite">
-         Loading video…
-        </div>
-       )}
-      </>
-     ) : (
-      <div className="reel-video-empty">Live footage is coming soon.</div>
-     )}
+     <div className="reel-video-stage">
+      {currentVideo ? (
+       <>
+        <video
+         key={currentVideo.id}
+         ref={videoRef}
+         src={currentVideo.src}
+         controls
+         playsInline
+         preload="auto"
+         aria-label={currentVideo.name || 'Live footage video'}
+         onLoadedData={showFirstFrame}
+         onCanPlay={showFirstFrame}
+         onError={() => setIsLoading(false)}
+        />
+        {isLoading && (
+         <div className="reel-video-loading" aria-live="polite">
+          Loading video…
+         </div>
+        )}
+       </>
+      ) : (
+       <div className="reel-video-empty">Live footage is coming soon.</div>
+      )}
+     </div>
 
      {videoCount > 1 && (
       <div className="reel-controls" aria-label="Live footage navigation">
