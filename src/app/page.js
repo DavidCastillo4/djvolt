@@ -19,8 +19,32 @@ async function getGalleryImages() {
  }
 }
 
-export default async function Home() {
- const galleryImages = await getGalleryImages();
+async function getLiveFootageVideos() {
+ try {
+  const sql = getDatabase();
+  const videos = await sql`
+   SELECT vidpk, vidname
+   FROM vid
+   WHERE islivefootage = TRUE
+   ORDER BY sortid, vidpk
+  `;
 
- return <Djvolts galleryImages={galleryImages} />;
+  return videos.map((video) => ({
+   id: video.vidpk,
+   name: video.vidname,
+   src: `/api/videos/id/${video.vidpk}`,
+  }));
+ } catch (error) {
+  console.error('Unable to load live footage videos from the database:', error);
+  return [];
+ }
+}
+
+export default async function Home() {
+ const [galleryImages, liveFootageVideos] = await Promise.all([
+  getGalleryImages(),
+  getLiveFootageVideos(),
+ ]);
+
+ return <Djvolts galleryImages={galleryImages} liveFootageVideos={liveFootageVideos} />;
 }

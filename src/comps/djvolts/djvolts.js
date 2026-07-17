@@ -8,7 +8,7 @@ import { Services } from '@/comps/services/services';
 import { Ticker } from '@/comps/ticker/ticker';
 
 
-export const Djvolts = ({ galleryImages }) => (
+export const Djvolts = ({ galleryImages, liveFootageVideos }) => (
  <>
   <main>
    <Hero />
@@ -16,7 +16,7 @@ export const Djvolts = ({ galleryImages }) => (
    <About />
    <Services />
    <Gallery images={galleryImages} />
-   <LiveFootage />
+   <LiveFootage videos={liveFootageVideos} />
    <Booking />
   </main>
   <Footer />
