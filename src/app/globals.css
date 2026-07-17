@@ -25,6 +25,7 @@
     --body: 'Karla', system-ui, sans-serif;
 
     --max: 1180px;
+    --site-header-height:173px;
   }
 
 
@@ -85,7 +86,10 @@
   }
 
   *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
+  html{
+    scroll-behavior:smooth;
+    scroll-padding-top:var(--site-header-height);
+  }
   body{
     margin:0;
     background:var(--ink);
@@ -275,6 +279,7 @@
 
   /* ---------- section basics ---------- */
   section{padding:100px 0;}
+  section[id]{scroll-margin-top:var(--site-header-height);}
   .section-head{max-width:640px; margin-bottom:56px;}
   .kicker{
     font-family:var(--mono); font-size:0.8rem; letter-spacing:3px; text-transform:uppercase; color:var(--volt);
@@ -655,6 +660,7 @@
     }
   }
   @media (max-width:560px){
+    :root{--site-header-height:141px;}
     nav{padding-left:16px; padding-right:16px;}
     .brand img.brand-logo{height:112px;}
     .theme-picker select{max-width:118px; font-size:0.68rem; padding-left:8px;}
