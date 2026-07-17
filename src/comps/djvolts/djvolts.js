@@ -1,11 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 export const Djvolts = ({ galleryImages }) => {
  const [galleryPage, setGalleryPage] = useState(0);
  const [imagesPerPage, setImagesPerPage] = useState(8);
+ const [isGalleryTransitioning, setIsGalleryTransitioning] = useState(false);
+ const galleryTransitionTimer = useRef(null);
 
  useEffect(() => {
   const updateImagesPerPage = () => {
@@ -22,7 +24,11 @@ export const Djvolts = ({ galleryImages }) => {
  const galleryPageCount = Math.max(1, Math.ceil(galleryImages.length / imagesPerPage));
  const visibleGalleryImages = useMemo(() => {
   const startIndex = galleryPage * imagesPerPage;
-  return galleryImages.slice(startIndex, startIndex + imagesPerPage);
+
+  return galleryImages.slice(startIndex, startIndex + imagesPerPage).map((src, index) => ({
+   src,
+   imageIndex: startIndex + index,
+  }));
  }, [galleryImages, galleryPage, imagesPerPage]);
 
  useEffect(() => {
@@ -30,8 +36,18 @@ export const Djvolts = ({ galleryImages }) => {
  }, [galleryPage, galleryPageCount]);
 
  const changeGalleryPage = (direction) => {
-  setGalleryPage((currentPage) => (currentPage + direction + galleryPageCount) % galleryPageCount);
+  if (isGalleryTransitioning) return;
+
+  setIsGalleryTransitioning(true);
+  galleryTransitionTimer.current = window.setTimeout(() => {
+   setGalleryPage((currentPage) => (currentPage + direction + galleryPageCount) % galleryPageCount);
+   requestAnimationFrame(() => setIsGalleryTransitioning(false));
+  }, 180);
  };
+
+ useEffect(() => () => {
+  if (galleryTransitionTimer.current) window.clearTimeout(galleryTransitionTimer.current);
+ }, []);
 
  useEffect(() => {
   const cleanup = [];
@@ -384,29 +400,28 @@ export const Djvolts = ({ galleryImages }) => {
        <h2>From the booth and the dance floor.</h2>
        <p>A few shots from recent sets — string lights, packed floors, and the rig that makes it all run.</p>
       </div>
-      <div className="gallery-grid gallery-page" id="galleryGrid" key={`${galleryPage}-${imagesPerPage}`}>
-       {visibleGalleryImages.map((imageSrc, index) => {
-        const imageIndex = galleryPage * imagesPerPage + index;
-
-        return (
-         <figure
-          className={`g${index + 1}`}
-          data-gallery-index={imageIndex}
-          key={imageSrc}
-          tabIndex="0"
-          role="button"
-          aria-label={`View larger photo ${imageIndex + 1}`}
-         >
-          <img
-           src={imageSrc}
-           alt={`DJ Volts event photo ${imageIndex + 1}`}
-           loading="lazy"
-           decoding="async"
-          />
-          <span className="gallery-zoom" aria-hidden="true">⤢</span>
-         </figure>
-        );
-       })}
+      <div
+       className={`gallery-grid gallery-pattern-${(galleryPage % 3) + 1} gallery-count-${visibleGalleryImages.length}${isGalleryTransitioning ? ' is-transitioning' : ''}`}
+       id="galleryGrid"
+      >
+       {visibleGalleryImages.map(({ src, imageIndex }, index) => (
+        <figure
+         className={`gallery-item gallery-item-${index + 1}`}
+         data-gallery-index={imageIndex}
+         key={src}
+         tabIndex="0"
+         role="button"
+         aria-label={`View larger photo ${imageIndex + 1}`}
+        >
+         <img
+          src={src}
+          alt={`DJ Volts event photo ${imageIndex + 1}`}
+          loading="lazy"
+          decoding="async"
+         />
+         <span className="gallery-zoom" aria-hidden="true">⤢</span>
+        </figure>
+       ))}
       </div>
       {galleryPageCount > 1 && (
        <div className="gallery-controls" aria-label="Gallery navigation">
