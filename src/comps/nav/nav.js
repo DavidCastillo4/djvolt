@@ -1,11 +1,36 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+
+const THEMES = [
+ { value: 'original', label: 'Original Workshop' },
+ { value: 'electric-sunset', label: 'Electric Sunset' },
+ { value: 'redline', label: 'Redline' },
+ { value: 'gold-rush', label: 'Gold Rush' },
+ { value: 'neon-night', label: 'Neon Night' },
+ { value: 'purple-pulse', label: 'Purple Pulse' },
+ { value: 'ice-voltage', label: 'Ice Voltage' },
+];
 
 export const Navigation = () => {
  const pathname = usePathname();
+ const [theme, setTheme] = useState('original');
+
+
+ useEffect(() => {
+  const savedTheme = window.localStorage.getItem('dj-volts-theme') || 'original';
+  setTheme(savedTheme);
+  document.documentElement.dataset.theme = savedTheme;
+ }, []);
+
+ const handleThemeChange = (event) => {
+  const nextTheme = event.target.value;
+  setTheme(nextTheme);
+  document.documentElement.dataset.theme = nextTheme;
+  window.localStorage.setItem('dj-volts-theme', nextTheme);
+ };
 
  useEffect(() => {
   const menuBtn = document.getElementById('menuBtn');
@@ -60,6 +85,14 @@ export const Navigation = () => {
        <a href="#book">Book</a>
       </li>
      </ul>
+     <label className="theme-picker">
+      <span className="sr-only">Choose a color theme</span>
+      <select value={theme} onChange={handleThemeChange} aria-label="Choose a color theme">
+       {THEMES.map((option) => (
+        <option key={option.value} value={option.value}>{option.label}</option>
+       ))}
+      </select>
+     </label>
      <a href="#book" className="nav-cta">Get a Quote</a>
      <button className="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">☰</button>
     </nav>
