@@ -1,28 +1,26 @@
-import fs from 'fs';
-import path from 'path';
-
 import { Djvolts } from '@/comps/djvolts/djvolts';
+import { getDatabase } from '@/lib/db';
 
-const supportedImageExtensions = new Set(['.avif', '.gif', '.jpeg', '.jpg', '.png', '.webp']);
+export const dynamic = 'force-dynamic';
 
-function getGalleryImages() {
- const imagesDirectory = path.join(process.cwd(), 'public', 'assets', 'images');
-
+async function getGalleryImages() {
  try {
-  return fs
-   .readdirSync(imagesDirectory, { withFileTypes: true })
-   .filter((entry) => entry.isFile() && supportedImageExtensions.has(path.extname(entry.name).toLowerCase()))
-   .map((entry) => entry.name)
-   .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
-   .map((fileName) => `/assets/images/${encodeURIComponent(fileName)}`);
+  const sql = getDatabase();
+  const images = await sql`
+   SELECT imgpk
+   FROM img
+   ORDER BY sortid, imgpk
+  `;
+
+  return images.map((image) => `/api/images/${image.imgpk}`);
  } catch (error) {
-  console.error('Unable to read gallery images:', error);
+  console.error('Unable to load gallery images from the database:', error);
   return [];
  }
 }
 
-export default function Home() {
- const galleryImages = getGalleryImages();
+export default async function Home() {
+ const galleryImages = await getGalleryImages();
 
  return <Djvolts galleryImages={galleryImages} />;
 }

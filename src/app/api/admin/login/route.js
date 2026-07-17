@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { ADMIN_COOKIE_NAME, getAdminSessionValue } from '@/lib/adminAuth';
 import { getDatabase } from '@/lib/db';
 
+export const runtime = 'nodejs';
+
 export async function POST(request) {
  try {
   const { password } = await request.json();
