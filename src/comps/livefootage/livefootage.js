@@ -2,9 +2,7 @@ export const LiveFootage = () => (
  <section className="reel" id="reel">
   <div className="wrap reel-grid">
    <div className="reel-video">
-    <video controls playsInline poster="/assets/images/dance.jpg">
-     <source src="/assets/video/reel-party.mp4" type="video/mp4" />
-    </video>
+    <video src="/api/videos/live-footage" controls playsInline poster="/assets/images/dance.jpg" />
    </div>
    <div className="reel-copy">
     <span className="kicker">Live Footage</span>
