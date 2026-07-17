@@ -7,6 +7,7 @@ import { LiveFootage } from '@/comps/livefootage/livefootage';
 import { Services } from '@/comps/services/services';
 import { Ticker } from '@/comps/ticker/ticker';
 
+
 export const Djvolts = ({ galleryImages }) => (
  <>
   <main>
