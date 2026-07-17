@@ -540,6 +540,7 @@
   .reel-grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:48px; align-items:center;}
   .reel-video{border-radius:8px; overflow:hidden; border:1px solid var(--wood-line); position:relative;}
   .reel-video video{width:100%; display:block;}
+  .reel-video-loading{position:absolute; inset:0 0 49px; display:grid; place-items:center; background:#000; color:var(--cream-dim); font-family:var(--mono); font-size:.8rem; letter-spacing:.08em; text-transform:uppercase; pointer-events:none;}
   .reel-video-empty{min-height:320px; display:grid; place-items:center; padding:32px; color:var(--cream-dim); font-family:var(--mono); text-align:center;}
   .reel-controls{display:flex; align-items:center; justify-content:center; gap:14px; padding:12px 14px; background:var(--panel-2); border-top:1px solid var(--wood-line);}
   .reel-controls button{width:42px; height:36px; border:1px solid var(--wood-line); border-radius:4px; background:var(--ink); color:var(--cream); font-size:1.6rem; line-height:1; cursor:pointer; transition:border-color .2s ease, color .2s ease, transform .15s ease;}

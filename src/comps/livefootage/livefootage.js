@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 export const LiveFootage = ({ videos }) => {
  const [currentIndex, setCurrentIndex] = useState(0);
+ const [isLoading, setIsLoading] = useState(false);
  const videoRef = useRef(null);
  const videoCount = videos.length;
  const currentVideo = videos[currentIndex] || null;
@@ -12,15 +13,46 @@ export const LiveFootage = ({ videos }) => {
   if (currentIndex >= videoCount) setCurrentIndex(0);
  }, [currentIndex, videoCount]);
 
+ useEffect(() => {
+  const video = videoRef.current;
+  if (!video || !currentVideo) return;
+
+  setIsLoading(true);
+  video.pause();
+  video.load();
+ }, [currentVideo]);
+
  const changeVideo = (direction) => {
   if (videoCount <= 1) return;
 
-  if (videoRef.current) {
-   videoRef.current.pause();
-   videoRef.current.currentTime = 0;
+  const video = videoRef.current;
+  if (video) {
+   video.pause();
+   video.removeAttribute('src');
+   video.load();
   }
 
+  setIsLoading(true);
   setCurrentIndex((index) => (index + direction + videoCount) % videoCount);
+ };
+
+ const showFirstFrame = () => {
+  const video = videoRef.current;
+  if (!video) return;
+
+  video.pause();
+
+  // A tiny seek prompts browsers to decode and paint the selected video's
+  // first frame without autoplaying it or carrying over the prior frame.
+  if (video.duration > 0 && video.currentTime === 0) {
+   try {
+    video.currentTime = Math.min(0.01, video.duration);
+   } catch {
+    // Some browsers paint frame zero immediately and do not permit the seek yet.
+   }
+  }
+
+  setIsLoading(false);
  };
 
  return (
@@ -28,17 +60,25 @@ export const LiveFootage = ({ videos }) => {
    <div className="wrap reel-grid">
     <div className="reel-video">
      {currentVideo ? (
-      <video
-       key={currentVideo.id}
-       ref={videoRef}
-       controls
-       playsInline
-       preload="metadata"
-       poster="/assets/images/dance.jpg"
-       aria-label={currentVideo.name || 'Live footage video'}
-      >
-       <source src={currentVideo.src} type="video/mp4" />
-      </video>
+      <>
+       <video
+        key={currentVideo.id}
+        ref={videoRef}
+        src={currentVideo.src}
+        controls
+        playsInline
+        preload="auto"
+        aria-label={currentVideo.name || 'Live footage video'}
+        onLoadedData={showFirstFrame}
+        onCanPlay={showFirstFrame}
+        onError={() => setIsLoading(false)}
+       />
+       {isLoading && (
+        <div className="reel-video-loading" aria-live="polite">
+         Loading video…
+        </div>
+       )}
+      </>
      ) : (
       <div className="reel-video-empty">Live footage is coming soon.</div>
      )}
