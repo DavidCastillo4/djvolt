@@ -35,21 +35,30 @@ export const AdminDashboard = () => {
      <h1 id="admin-dashboard-title">Admin Dashboard</h1>
     </header>
 
-    <nav className="admin-tabs" aria-label="Dashboard sections">
+    <div className="admin-tabs" role="tablist" aria-label="Dashboard sections">
      {TABS.map((tab) => (
       <button
        key={tab.id}
        type="button"
+       id={`admin-tab-${tab.id}`}
+       role="tab"
        className={activeTab === tab.id ? 'active' : ''}
        aria-selected={activeTab === tab.id}
+       aria-controls={`admin-panel-${tab.id}`}
+       tabIndex={activeTab === tab.id ? 0 : -1}
        onClick={() => setActiveTab(tab.id)}
       >
        {tab.label}
       </button>
      ))}
-    </nav>
+    </div>
 
-    <div className="admin-tab-content">
+    <div
+     id={`admin-panel-${activeTab}`}
+     className="admin-tab-content"
+     role="tabpanel"
+     aria-labelledby={`admin-tab-${activeTab}`}
+    >
      <div className="admin-placeholder">
       <h2>{content.title}</h2>
       <p>{content.description}</p>
