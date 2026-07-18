@@ -334,15 +334,19 @@ const GalleryManager = () => {
         </div>
 
         <div className="admin-media-details">
-         <strong title={item.name}>{item.name}</strong>
-         <label className="admin-gallery-toggle">
-          <input type="checkbox" checked={item.isGallery} onChange={() => toggleGallery(item)} />
-          <span>Included in gallery</span>
-         </label>
-
          <div className="admin-media-controls">
-          <button type="button" onClick={() => moveByButton(index, -1)} disabled={index === 0} aria-label="Move earlier">←</button>
-          <button type="button" onClick={() => moveByButton(index, 1)} disabled={index === items.length - 1} aria-label="Move later">→</button>
+          <div className="admin-media-controls-left">
+           <label className="admin-gallery-toggle" title="Include in gallery">
+            <input
+             type="checkbox"
+             checked={item.isGallery}
+             onChange={() => toggleGallery(item)}
+             aria-label="Include in gallery"
+            />
+           </label>
+           <button type="button" onClick={() => moveByButton(index, -1)} disabled={index === 0} aria-label="Move earlier">←</button>
+           <button type="button" onClick={() => moveByButton(index, 1)} disabled={index === items.length - 1} aria-label="Move later">→</button>
+          </div>
           <button
            type="button"
            className="delete"

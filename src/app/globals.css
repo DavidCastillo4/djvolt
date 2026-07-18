@@ -2077,35 +2077,38 @@ footer {
 
 .admin-media-details {
  display: grid;
- gap: 11px;
+ gap: 9px;
  padding: 13px;
 }
 
-.admin-media-details strong {
- overflow: hidden;
- white-space: nowrap;
- text-overflow: ellipsis;
- font-size: .92rem;
-}
-
 .admin-gallery-toggle {
- display: flex;
+ display: inline-flex;
  align-items: center;
- gap: 8px;
- color: var(--cream-dim);
- font-size: .84rem;
+ justify-content: center;
+ flex: 0 0 auto;
  cursor: pointer;
 }
 
 .admin-gallery-toggle input {
- width: 17px;
- height: 17px;
+ width: 18px;
+ height: 18px;
+ margin: 0;
  accent-color: var(--volt);
+ cursor: pointer;
 }
 
 .admin-media-controls {
  display: flex;
- gap: 7px;
+ align-items: center;
+ justify-content: space-between;
+ gap: 18px;
+}
+
+.admin-media-controls-left {
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ min-width: 0;
 }
 
 .admin-media-controls button {
@@ -2119,7 +2122,10 @@ footer {
 }
 
 .admin-media-controls button.delete {
- flex: 1;
+ flex: 0 0 auto;
+ min-width: 82px;
+ padding-inline: 14px;
+ margin-left: auto;
  color: #ffd1c4;
 }
 
