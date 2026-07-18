@@ -957,3 +957,121 @@
 @media (prefers-reduced-motion:reduce){
   .dance-background video{display:none;}
 }
+
+/* ---------- premium warm dance-floor refinement ---------- */
+/* The original workshop now uses the orange DJ Volts brand as its primary accent. */
+:root{
+  --volt:#f59a18;
+  --volt-rgb:245,154,24;
+  --volt-dim:#a95708;
+  --section-top-padding:54px;
+}
+
+/* Keep the fixed dance footage recognizable, warm and cinematic. */
+.dance-background{
+  background:
+    radial-gradient(circle at 72% 16%, rgba(var(--amber-rgb),.2), transparent 35%),
+    radial-gradient(circle at 18% 78%, rgba(244,101,15,.13), transparent 36%),
+    #100a06;
+}
+
+.dance-background video{
+  filter:blur(2px) brightness(.52) saturate(1.04) contrast(1.12) sepia(.08);
+  transform:scale(1.045);
+  transition:opacity .7s ease;
+}
+
+.dance-background-wash{
+  background:
+    linear-gradient(180deg, rgba(9,6,3,.42), rgba(12,7,3,.26) 42%, rgba(8,5,3,.54)),
+    linear-gradient(90deg, rgba(8,5,3,.3), transparent 42%, rgba(8,5,3,.27)),
+    radial-gradient(circle at 50% 20%, rgba(var(--amber-rgb),.12), transparent 48%);
+}
+
+.dance-background-glow{
+  opacity:.18;
+  filter:blur(105px);
+}
+.dance-background-glow-two{opacity:.14;}
+
+/* Tighter vertical rhythm so the page reads as one cohesive experience. */
+.dance-stage section{
+  padding:var(--section-top-padding) 0 0;
+}
+.dance-stage section:last-of-type{
+  padding-bottom:54px;
+}
+.dance-stage .section-head{
+  margin-bottom:34px;
+}
+.dance-stage .gallery-heading,
+.dance-stage .book-heading{
+  margin-bottom:24px;
+}
+
+/* More transparent, warmer glass panels with an orange edge. */
+.dance-stage section > .wrap{
+  padding:clamp(28px,3.5vw,48px);
+  border:1px solid rgba(var(--amber-rgb),.52);
+  border-radius:16px;
+  background:
+    linear-gradient(145deg, rgba(18,12,8,.7), rgba(40,24,13,.58));
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.4),
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 0 0 1px rgba(var(--amber-rgb),.035),
+    0 0 30px rgba(var(--amber-rgb),.055);
+  backdrop-filter:blur(10px) saturate(1.12);
+}
+
+.dance-stage section:nth-of-type(even) > .wrap{
+  background:
+    linear-gradient(145deg, rgba(34,20,11,.62), rgba(14,10,7,.72));
+}
+
+.dance-stage section > .wrap::before{
+  background:linear-gradient(90deg, transparent, rgba(var(--amber-rgb),.66), transparent);
+}
+
+/* Carry the premium orange treatment into the inner cards and controls. */
+.dance-stage .breaker-box,
+.dance-stage .service-ticket,
+.dance-stage .contact-list a,
+.dance-stage .nameplate{
+  border-color:rgba(var(--amber-rgb),.26);
+  background:rgba(40,25,15,.66);
+}
+.dance-stage .breaker-box{
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.018), 0 20px 45px rgba(0,0,0,.3);
+}
+.dance-stage .breakers{background:rgba(var(--amber-rgb),.2);}
+.dance-stage .breaker{background:rgba(46,29,18,.72);}
+.dance-stage .breaker:hover,
+.dance-stage .breaker.active{background:rgba(52,31,17,.86);}
+.dance-stage .media-card{border-color:rgba(var(--amber-rgb),.26);}
+.dance-stage .media-card:hover{border-color:var(--amber);}
+
+/* Warm, translucent ticker and footer rather than solid bands. */
+.dance-stage .ticker{
+  background:rgba(13,9,6,.68);
+  backdrop-filter:blur(12px) saturate(1.08);
+  border-color:rgba(var(--amber-rgb),.22);
+}
+.dance-stage footer{
+  background:rgba(10,7,5,.72);
+  backdrop-filter:blur(12px);
+  border-top-color:rgba(var(--amber-rgb),.14);
+}
+
+@media (max-width:700px){
+  :root{--section-top-padding:34px;}
+  .dance-stage section:last-of-type{padding-bottom:34px;}
+  .dance-stage section > .wrap{
+    width:calc(100% - 24px);
+    padding:26px 20px;
+    border-radius:13px;
+  }
+  .dance-background video{
+    filter:blur(1.5px) brightness(.44) saturate(.96) contrast(1.1) sepia(.06);
+  }
+}
