@@ -3,7 +3,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-const AUTO_SCROLL_PIXELS_PER_SECOND = 18;
+const AUTO_SCROLL_PIXELS_PER_SECOND = 12;
 
 const MediaCard = ({ item, itemKey, onOpen, shouldPlay }) => {
  const videoRef = useRef(null);
@@ -73,6 +73,7 @@ export const Gallery = ({ mediaItems }) => {
  const animationRef = useRef(null);
  const resumeTimerRef = useRef(null);
  const lastFrameTimeRef = useRef(null);
+ const scrollPositionRef = useRef(0);
  const closeButtonRef = useRef(null);
  const touchStart = useRef({ x: 0, y: 0 });
 
@@ -100,7 +101,10 @@ export const Gallery = ({ mediaItems }) => {
    const firstSet = track.querySelector('.media-gallery-set');
    if (!firstSet) return;
    const setWidth = firstSet.getBoundingClientRect().width + 16;
-   if (setWidth > 0) track.scrollLeft = setWidth;
+   if (setWidth > 0) {
+    scrollPositionRef.current = setWidth;
+    track.scrollLeft = setWidth;
+   }
   };
 
   const initialTimer = window.setTimeout(positionAtMiddleSet, 50);
@@ -132,8 +136,13 @@ export const Gallery = ({ mediaItems }) => {
    lastFrameTimeRef.current = timestamp;
 
    if (setWidth > 0) {
-    track.scrollLeft += AUTO_SCROLL_PIXELS_PER_SECOND * elapsedSeconds;
-    if (track.scrollLeft >= setWidth * 2) track.scrollLeft -= setWidth;
+    scrollPositionRef.current += AUTO_SCROLL_PIXELS_PER_SECOND * elapsedSeconds;
+
+    if (scrollPositionRef.current >= setWidth * 2) {
+     scrollPositionRef.current -= setWidth;
+    }
+
+    track.scrollLeft = scrollPositionRef.current;
    }
 
    animationRef.current = window.requestAnimationFrame(animate);
@@ -160,11 +169,16 @@ export const Gallery = ({ mediaItems }) => {
   const setWidth = getSetWidth();
   if (setWidth <= 0) return;
 
-  if (track.scrollLeft < setWidth * 0.5) {
-   track.scrollLeft += setWidth;
-  } else if (track.scrollLeft >= setWidth * 2.5) {
-   track.scrollLeft -= setWidth;
+  let nextPosition = track.scrollLeft;
+
+  if (nextPosition < setWidth * 0.5) {
+   nextPosition += setWidth;
+  } else if (nextPosition >= setWidth * 2.5) {
+   nextPosition -= setWidth;
   }
+
+  scrollPositionRef.current = nextPosition;
+  if (track.scrollLeft !== nextPosition) track.scrollLeft = nextPosition;
  };
 
  const pauseThenResume = () => {
@@ -251,16 +265,13 @@ export const Gallery = ({ mediaItems }) => {
        <div
         ref={trackRef}
         className="media-gallery-track"
-        onScroll={maintainEndlessLoop}
-        onMouseEnter={() => setIsInteracting(true)}
-        onMouseLeave={() => setIsInteracting(false)}
-        onPointerDown={() => setIsInteracting(true)}
-        onPointerUp={() => setIsInteracting(false)}
-        onPointerCancel={() => setIsInteracting(false)}
-        onFocusCapture={() => setIsInteracting(true)}
-        onBlurCapture={(event) => {
-         if (!event.currentTarget.contains(event.relatedTarget)) setIsInteracting(false);
+        onScroll={() => {
+         scrollPositionRef.current = trackRef.current?.scrollLeft ?? 0;
+         maintainEndlessLoop();
         }}
+        onPointerDown={() => setIsInteracting(true)}
+        onPointerUp={pauseThenResume}
+        onPointerCancel={pauseThenResume}
        >
         {repeatedSets.map((setItems, setIndex) => (
          <div className="media-gallery-set" key={`gallery-set-${setIndex}`}>

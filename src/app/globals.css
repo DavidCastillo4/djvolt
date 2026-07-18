@@ -293,7 +293,7 @@
 
   /* ---------- about ---------- */
   .about{background:var(--panel);}
-  .about-grid{display:grid; grid-template-columns:0.85fr 1.15fr; gap:64px; align-items:center;}
+  .about-grid{display:grid; grid-template-columns:0.85fr 1.15fr; gap:64px; align-items:center; margin-top:18px;}
   .about-photo{position:relative;}
   .about-photo img{border-radius:6px; border:1px solid var(--wood-line);}
   .about-photo .tag{
@@ -460,6 +460,8 @@
 
   /* ---------- booking ---------- */
   .book{background:var(--panel); position:relative; overflow:hidden;}
+  .book-heading{max-width:720px; margin-bottom:36px;}
+  .book-heading p{color:var(--cream-dim); font-size:1.05rem; max-width:44ch;}
   .book-grid{display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:start;}
   .service-ticket{
     background:var(--panel-2); border:1px dashed var(--wood-line); border-radius:8px; padding:28px;
