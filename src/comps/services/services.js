@@ -6,7 +6,7 @@ const serviceItems = [
  { title: 'Weddings', description: 'Ceremony sound, cocktail hour playlists, introductions, and a reception that reads the room — not a script.' },
  { title: 'Private Parties', description: 'Anniversaries, graduations and backyard cookouts. Bring the cooler, he\'ll bring the playlist.' },
  { title: 'Bars & Breweries', description: 'Line dance nights, live trivia breaks, and sets that keep a bar crowd on their feet until close.' },
- { title: 'Corporate & Company Events', description: 'Company parties and events with clean sound, tasteful lighting, and a set list that fits the crowd.' },
+ { title: 'Corporate & Company', description: 'Company parties and events with clean sound, tasteful lighting, and a set list that fits the crowd.' },
 ];
 
 export const Services = () => {
@@ -17,7 +17,7 @@ export const Services = () => {
    <div className="wrap">
     <div className="section-head">
      <span className="kicker">Services</span>
-     <h2>Flip a breaker to see what&apos;s on.</h2>
+     <h2>Flip a breaker to see what&apos;s on</h2>
      <p>Every event gets the same rig, the same attention to detail, and a set list built around your crowd — not a generic top 40 loop.</p>
     </div>
     <div className="breaker-box">

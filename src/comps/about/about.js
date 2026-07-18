@@ -10,7 +10,7 @@ export const About = () => (
      <div className="tag">120V &amp; PROUD OF IT</div>
     </div>
     <div className="about-copy">
-     <h2>Two trades. One guy who shows up early and checks his own wiring.</h2>
+     <h2>Two trades. One guy who shows up early and checks his own wiring</h2>
      <p>By day, he&apos;s out running conduit and troubleshooting panels. By night, he&apos;s behind the decks — same instinct for making sure everything&apos;s connected right, just with a lot more bass.</p>
      <div className="nameplate">
       <div className="nameplate-head">

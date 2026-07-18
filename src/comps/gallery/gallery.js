@@ -294,7 +294,7 @@ export const Gallery = ({ mediaItems }) => {
     <div className="wrap">
      <div className="section-head gallery-heading">
       <span className="kicker">Gallery</span>
-      <h2>From the booth & dance floor.</h2>
+      <h2>From the booth & dance floor</h2>
       <p>Photos and live footage from recent sets — click any moment to see it full size.</p>
      </div>
 

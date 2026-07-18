@@ -3,7 +3,7 @@ export const Booking = () => (
   <div className="wrap">
    <div className="book-heading">
     <span className="kicker">Booking</span>
-    <h2>Let&apos;s wire up your event.</h2>
+    <h2>Let&apos;s wire up your event</h2>
    </div>
    <div className="book-grid">
     <div className="book-contact">
