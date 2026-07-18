@@ -19,7 +19,7 @@ export const DanceBackground = () => {
   <div className={`dance-background${isReady ? ' is-ready' : ''}`} aria-hidden="true">
    <video
     ref={videoRef}
-    src="/api/videos/live-footage"
+    src="/api/videos/background"
     autoPlay
     muted
     loop

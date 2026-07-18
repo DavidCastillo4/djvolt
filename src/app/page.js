@@ -7,14 +7,13 @@ async function getGalleryMedia() {
  try {
   const sql = getDatabase();
   const media = await sql`
-   SELECT imgpk AS id, imgname AS name, 'image' AS type, sortid
+   SELECT imgpk AS id, 'image' AS type, sortid
    FROM img
 
    UNION ALL
 
-   SELECT vidpk AS id, vidname AS name, 'video' AS type, sortid
+   SELECT vidpk AS id, 'video' AS type, sortid
    FROM vid
-   WHERE islivefootage = TRUE
 
    ORDER BY sortid, type, id
   `;
@@ -22,7 +21,6 @@ async function getGalleryMedia() {
   return media.map((item) => ({
    key: `${item.type}-${item.id}`,
    id: item.id,
-   name: item.name,
    type: item.type,
    src: item.type === 'video'
     ? `/api/videos/id/${item.id}`

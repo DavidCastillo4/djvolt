@@ -49,14 +49,14 @@ async function findVideo(sql, videoRole) {
   return rows[0] || null;
  }
 
- if (videoRole === 'live-footage') {
+ if (videoRole === 'background') {
   const rows = await sql`
    SELECT
     vidpk,
     vidtype,
     octet_length(viddata) AS videosize
    FROM vid
-   WHERE islivefootage = TRUE
+   WHERE isbackground = TRUE
    ORDER BY sortid, vidpk
    LIMIT 1
   `;
@@ -71,7 +71,7 @@ export async function GET(request, { params }) {
  try {
   const { videoRole } = await params;
 
-  if (videoRole !== 'hero' && videoRole !== 'live-footage') {
+  if (videoRole !== 'hero' && videoRole !== 'background') {
    return new Response('Video not found.', { status: 404 });
   }
 

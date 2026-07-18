@@ -40,7 +40,6 @@ export async function GET(request, { params }) {
    SELECT vidpk, vidtype, octet_length(viddata) AS videosize
    FROM vid
    WHERE vidpk = ${videoId}
-     AND islivefootage = TRUE
    LIMIT 1
   `;
 
@@ -100,7 +99,7 @@ export async function GET(request, { params }) {
    },
   });
  } catch (error) {
-  console.error('Unable to serve live footage video:', error);
+  console.error('Unable to serve gallery video:', error);
   return new Response('Unable to load video.', { status: 500 });
  }
 }

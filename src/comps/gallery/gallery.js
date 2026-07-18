@@ -10,7 +10,7 @@ const MediaCard = ({ item, itemKey, onOpen }) => (
    type="button"
    className="media-card"
    onClick={() => onOpen(item)}
-   aria-label={`Open ${item.type === 'video' ? 'video' : 'photo'} ${item.name || ''}`.trim()}
+   aria-label={`Open ${item.type === 'video' ? 'video' : 'photo'}`}
    data-media-key={itemKey}
   >
    {item.type === 'video' ? (
@@ -23,7 +23,7 @@ const MediaCard = ({ item, itemKey, onOpen }) => (
      aria-hidden="true"
     />
    ) : (
-    <img src={item.src} alt={item.name || 'DJ Volts event photo'} loading="lazy" decoding="async" />
+    <img src={item.src} alt="DJ Volts event photo" loading="lazy" decoding="async" />
    )}
    <span className="media-card-type" aria-hidden="true">{item.type === 'video' ? '▶' : '⤢'}</span>
   </button>
@@ -350,7 +350,7 @@ export const Gallery = ({ mediaItems }) => {
          preload="metadata"
         />
        ) : (
-        <img className="lightbox-media" src={selectedItem.src} alt={selectedItem.name || 'DJ Volts event photo'} />
+        <img className="lightbox-media" src={selectedItem.src} alt="DJ Volts event photo" />
        )}
 
        <button ref={closeButtonRef} type="button" className="lightbox-close" onClick={closeViewer} aria-label="Close gallery viewer">✕</button>
