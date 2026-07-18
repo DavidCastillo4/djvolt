@@ -25,7 +25,8 @@
     --body: 'Karla', system-ui, sans-serif;
 
     --max: 1180px;
-    --site-header-height:173px;
+    --site-header-height:153px;
+    --section-top-padding:100px;
   }
 
 
@@ -125,7 +126,7 @@
   }
   nav{
     display:flex; align-items:center; justify-content:space-between;
-    padding:14px 28px;
+    padding:4px 28px;
     max-width:var(--max); margin:0 auto;
   }
   .brand{
@@ -278,8 +279,9 @@
   @keyframes scroll{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
 
   /* ---------- section basics ---------- */
-  section{padding:100px 0;}
-  section[id]{scroll-margin-top:var(--site-header-height);}
+  section{padding:var(--section-top-padding) 0;}
+  /* Align each section heading directly below the sticky navbar. */
+  section[id]{scroll-margin-top:calc(var(--site-header-height) - var(--section-top-padding));}
   .section-head{max-width:640px; margin-bottom:56px;}
   .kicker{
     font-family:var(--mono); font-size:0.8rem; letter-spacing:3px; text-transform:uppercase; color:var(--volt);
@@ -561,12 +563,15 @@
     .breakers{grid-template-columns:repeat(2,1fr);}
   }
   @media (max-width:560px){
-    :root{--site-header-height:129px;}
-    nav{padding:8px 16px;}
+    :root{
+      --site-header-height:117px;
+      --section-top-padding:70px;
+    }
+    nav{padding:2px 16px;}
     .brand img.brand-logo{height:112px;}
     .theme-picker select{max-width:118px; font-size:0.68rem; padding-left:8px;}
     .nav-cta{display:none;}
-    section{padding:70px 0;}
+    section{padding:var(--section-top-padding) 0;}
     .hero{min-height:100vh;}
     .hero-specs{width:100%;}
     .hero-specs div{flex:1 1 50%;}
@@ -579,7 +584,10 @@
 
   /* Compact navigation for phones held horizontally. */
   @media (orientation:landscape) and (max-height:500px) and (max-width:950px){
-    :root{--site-header-height:82px;}
+    :root{
+      --site-header-height:82px;
+      --section-top-padding:70px;
+    }
     header.site > nav{
       min-height:0;
       padding:3px 14px;
