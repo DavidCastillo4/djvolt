@@ -8,6 +8,29 @@ const TABS = [
  { id: 'videos', label: 'Video Backgrounds' },
 ];
 
+const IMAGE_MAX_BYTES = 4 * 1024 * 1024;
+const VIDEO_MAX_BYTES = Math.floor(4.2 * 1024 * 1024);
+const IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'webp', 'gif']);
+const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const VIDEO_EXTENSIONS = new Set(['mp4']);
+const VIDEO_TYPES = new Set(['video/mp4']);
+
+const getExtension = (name = '') => name.split('.').pop()?.toLowerCase() || '';
+
+const readResponse = async (response) => {
+ const text = await response.text();
+ if (!text) return {};
+
+ try {
+  return JSON.parse(text);
+ } catch {
+  if (response.status === 413) {
+   return { message: 'The selected file is too large. Images must be 4 MB or smaller and videos must be 4.2 MB or smaller.' };
+  }
+  return { message: 'The upload failed. Please try again.' };
+ }
+};
+
 const GalleryManager = () => {
  const [items, setItems] = useState([]);
  const [loading, setLoading] = useState(true);
@@ -47,23 +70,68 @@ const GalleryManager = () => {
   return () => window.clearTimeout(timer);
  }, [message]);
 
- const uploadFiles = async (event) => {
-  const files = Array.from(event.target.files || []);
-  if (files.length === 0) return;
+ useEffect(() => {
+  if (!error) return undefined;
 
-  setUploading(true);
+  const timer = window.setTimeout(() => setError(''), 4200);
+  return () => window.clearTimeout(timer);
+ }, [error]);
+
+ const uploadFiles = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
   setError('');
   setMessage('');
 
+  const extension = getExtension(file.name);
+  const mimeType = String(file.type || '').toLowerCase();
+  const isImage = IMAGE_EXTENSIONS.has(extension) && IMAGE_TYPES.has(mimeType);
+  const isVideo = VIDEO_EXTENSIONS.has(extension) && VIDEO_TYPES.has(mimeType);
+
+  if (file.size === 0) {
+   setError('This file is empty. Please choose another file.');
+   event.target.value = '';
+   return;
+  }
+
+  if (extension === 'heic' || extension === 'heif' || mimeType === 'image/heic' || mimeType === 'image/heif') {
+   setError('HEIC photos are not supported. Please convert the photo to JPG before uploading.');
+   event.target.value = '';
+   return;
+  }
+
+  if (!isImage && !isVideo) {
+   setError(mimeType.startsWith('video/') || VIDEO_EXTENSIONS.has(extension)
+    ? 'This video format is not supported. Please upload an MP4 video.'
+    : 'This file type is not supported. Upload a JPG, JPEG, PNG, WebP, GIF, or MP4 file.');
+   event.target.value = '';
+   return;
+  }
+
+  if (isImage && file.size > IMAGE_MAX_BYTES) {
+   setError('This image is too large. Images must be 4 MB or smaller.');
+   event.target.value = '';
+   return;
+  }
+
+  if (isVideo && file.size > VIDEO_MAX_BYTES) {
+   setError('This video is too large. Videos must be 4.2 MB or smaller.');
+   event.target.value = '';
+   return;
+  }
+
+  setUploading(true);
+
   try {
    const formData = new FormData();
-   files.forEach((file) => formData.append('files', file));
+   formData.append('file', file);
 
    const response = await fetch('/api/admin/gallery', { method: 'POST', body: formData });
-   const data = await response.json();
+   const data = await readResponse(response);
    if (!response.ok) throw new Error(data.message || 'Unable to upload media.');
 
-   setMessage(`${data.uploaded} ${data.uploaded === 1 ? 'item was' : 'items were'} uploaded.`);
+   setMessage('Media uploaded.');
    await loadItems();
   } catch (uploadError) {
    setError(uploadError.message);
@@ -202,8 +270,7 @@ const GalleryManager = () => {
       <input
        ref={fileInputRef}
        type="file"
-       accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime"
-       multiple
+       accept=".jpg,.jpeg,.png,.webp,.gif,.mp4,image/jpeg,image/png,image/webp,image/gif,video/mp4"
        disabled={uploading}
        onChange={uploadFiles}
       />
@@ -213,13 +280,14 @@ const GalleryManager = () => {
      </button>
     </div>
    </div>
+   <p className="admin-upload-rules">One file at a time · JPG, JPEG, PNG, WebP, GIF up to 4 MB · MP4 up to 4.2 MB</p>
 
    {message && (
     <div className="admin-gallery-toast" role="status" aria-live="polite">
      {message}
     </div>
    )}
-   {error && <div className="admin-gallery-message error" role="alert">{error}</div>}
+   {error && <div className="admin-gallery-toast error" role="alert" aria-live="assertive">{error}</div>}
 
    {loading ? (
     <div className="admin-gallery-loading">Loading gallery…</div>

@@ -2240,3 +2240,18 @@ footer {
  from { opacity: 0; transform: translateY(8px) scale(.985); }
  to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+/* Upload rules and fading error toast */
+.admin-upload-rules {
+ margin: -12px 0 0;
+ color: var(--cream-dim);
+ font-family: var(--mono);
+ font-size: .72rem;
+ line-height: 1.45;
+}
+
+.admin-gallery-toast.error {
+ border-color: rgba(255, 120, 90, .5);
+ background: rgba(98, 34, 27, .97);
+ color: #ffd7ce;
+}
