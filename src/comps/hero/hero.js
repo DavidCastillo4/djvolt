@@ -10,6 +10,7 @@ export const Hero = () => {
    <section className={`hero${videoReady ? ' hero-video-ready' : ''}`} style={{ padding: '0' }} id="top">
     <video
      src="/api/videos/hero"
+     poster="/api/posters/hero"
      autoPlay
      muted
      loop

@@ -20,6 +20,7 @@ export const DanceBackground = () => {
    <video
     ref={videoRef}
     src="/api/videos/background"
+    poster="/api/posters/background"
     autoPlay
     muted
     loop

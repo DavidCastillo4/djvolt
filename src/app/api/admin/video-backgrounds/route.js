@@ -99,12 +99,24 @@ export async function POST(request) {
    return NextResponse.json({ message: 'One of the selected videos no longer exists.' }, { status: 404 });
   }
 
+  // Clear the existing selections first. The hero and background columns use
+  // partial unique indexes, so trying to move TRUE from one row to another in
+  // a single UPDATE can temporarily violate those indexes.
+  await sql`
+   UPDATE vid
+   SET ishero = FALSE,
+       isbackground = FALSE
+   WHERE ishero = TRUE OR isbackground = TRUE
+  `;
+
+  await sql`
+   UPDATE vid
+   SET ishero = (vidpk = ${heroId}),
+       isbackground = (vidpk = ${backgroundId})
+   WHERE vidpk IN (${heroId}, ${backgroundId})
+  `;
+
   const updatedSettings = await sql`
-   WITH update_roles AS (
-    UPDATE vid
-    SET ishero = (vidpk = ${heroId}),
-        isbackground = (vidpk = ${backgroundId})
-   )
    UPDATE settings
    SET heroposter = ${heroPoster},
        backgroundposter = ${backgroundPoster}

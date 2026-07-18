@@ -216,11 +216,6 @@ nav {
 }
 
 .hero video {
- opacity: 0;
- transition: opacity .25s ease;
-}
-
-.hero.hero-video-ready video {
  opacity: 1;
 }
 
@@ -1609,14 +1604,10 @@ footer {
  width: 100vw;
  height: calc(100vh - var(--site-header-height));
  object-fit: cover;
- opacity: 0;
+ opacity: 1;
  filter: brightness(.28) saturate(.68) contrast(1.16);
  transform: scale(1.025);
  transition: opacity .65s ease;
-}
-
-.dance-background.is-ready video {
- opacity: 1;
 }
 
 .dance-background-wash {
