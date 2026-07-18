@@ -925,13 +925,13 @@
   border:1px solid rgba(var(--amber-rgb),.42);
   border-radius:16px;
   background:
-    linear-gradient(145deg, rgba(18,12,8,.7), rgba(40,24,13,.58));
+    linear-gradient(145deg, rgba(18,12,8,.52), rgba(40,24,13,.4));
   box-shadow:
     0 24px 60px rgba(0,0,0,.4),
     inset 0 1px 0 rgba(255,255,255,.055),
     0 0 0 1px rgba(var(--amber-rgb),.035),
     0 0 30px rgba(var(--amber-rgb),.055);
-  backdrop-filter:blur(10px) saturate(1.12);
+  backdrop-filter:blur(6px) saturate(1.08);
 }
 
 
