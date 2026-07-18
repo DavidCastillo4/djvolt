@@ -280,8 +280,13 @@
 
   /* ---------- section basics ---------- */
   section{padding:var(--section-top-padding) 0;}
-  /* Align each section heading directly below the sticky navbar. */
-  section[id]{scroll-margin-top:calc(var(--site-header-height) - var(--section-top-padding));}
+  /*
+   * The document already reserves the sticky header through scroll-padding-top.
+   * Pull the section itself upward by its internal top padding so the colored
+   * section label lands directly beneath the navbar without exposing a strip
+   * of the previous section.
+   */
+  section[id]{scroll-margin-top:calc(var(--section-top-padding) * -1);}
   .section-head{max-width:640px; margin-bottom:56px;}
   .kicker{
     font-family:var(--mono); font-size:0.8rem; letter-spacing:3px; text-transform:uppercase; color:var(--volt);
