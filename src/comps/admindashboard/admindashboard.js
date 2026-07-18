@@ -40,6 +40,13 @@ const GalleryManager = () => {
   loadItems();
  }, [loadItems]);
 
+ useEffect(() => {
+  if (!message) return undefined;
+
+  const timer = window.setTimeout(() => setMessage(''), 3200);
+  return () => window.clearTimeout(timer);
+ }, [message]);
+
  const uploadFiles = async (event) => {
   const files = Array.from(event.target.files || []);
   if (files.length === 0) return;
@@ -207,7 +214,11 @@ const GalleryManager = () => {
     </div>
    </div>
 
-   {message && <div className="admin-gallery-message success" role="status">{message}</div>}
+   {message && (
+    <div className="admin-gallery-toast" role="status" aria-live="polite">
+     {message}
+    </div>
+   )}
    {error && <div className="admin-gallery-message error" role="alert">{error}</div>}
 
    {loading ? (
@@ -295,12 +306,8 @@ const GalleryManager = () => {
       role="alertdialog"
       aria-modal="true"
       aria-labelledby="delete-media-title"
-      aria-describedby="delete-media-description"
      >
       <h2 id="delete-media-title">Delete media?</h2>
-      <p id="delete-media-description">
-       Delete <strong>{pendingDelete.name}</strong>? This action cannot be undone.
-      </p>
       <div className="admin-confirm-actions">
        <button type="button" className="cancel" autoFocus disabled={deleting} onClick={() => setPendingDelete(null)}>
         Cancel

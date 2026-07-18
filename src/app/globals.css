@@ -1943,10 +1943,20 @@ footer {
  border: 1px solid;
 }
 
-.admin-gallery-message.success {
- border-color: rgba(136, 220, 170, .45);
- background: rgba(52, 123, 82, .22);
+.admin-gallery-toast {
+ position: fixed;
+ top: 18px;
+ right: 18px;
+ z-index: 1200;
+ width: min(380px, calc(100vw - 36px));
+ padding: 13px 16px;
+ border: 1px solid rgba(136, 220, 170, .45);
+ border-radius: 6px;
+ background: rgba(30, 58, 39, .96);
  color: #d8ffe7;
+ box-shadow: 0 16px 40px rgba(0, 0, 0, .42);
+ font-weight: 600;
+ animation: admin-toast-life 3.2s ease forwards;
 }
 
 .admin-gallery-message.error {
@@ -2178,16 +2188,6 @@ footer {
  font-size: 1.45rem;
 }
 
-.admin-confirm-modal p {
- margin: 0;
- color: var(--cream-dim);
- line-height: 1.55;
- overflow-wrap: anywhere;
-}
-
-.admin-confirm-modal strong {
- color: var(--cream);
-}
 
 .admin-confirm-actions {
  display: flex;
@@ -2222,6 +2222,12 @@ footer {
  border: 1px solid rgba(255, 120, 90, .45);
  background: rgba(135, 47, 34, .5);
  color: #ffd1c4;
+}
+
+@keyframes admin-toast-life {
+ 0% { opacity: 0; transform: translateY(-8px); }
+ 8%, 82% { opacity: 1; transform: translateY(0); }
+ 100% { opacity: 0; transform: translateY(-6px); }
 }
 
 @keyframes admin-modal-fade {
