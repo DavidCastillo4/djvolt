@@ -2,10 +2,12 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { DEFAULT_SITE_CONTENT } from '@/lib/siteContent';
 
 const TABS = [
  { id: 'gallery', label: 'Gallery' },
  { id: 'videos', label: 'Video Backgrounds' },
+ { id: 'content', label: 'Content' },
 ];
 
 const IMAGE_MAX_BYTES = 4 * 1024 * 1024;
@@ -595,6 +597,50 @@ const VideoBackgroundManager = () => {
  );
 };
 
+
+const CONTENT_FIELDS = {
+ nav: [['about','About link',18],['services','Services link',18],['gallery','Gallery link',18],['book','Book link',18],['cta','Quote button',24]],
+ hero: [['eyebrow','Booking banner',55],['titleTop','Logo line 1',12],['titleBottom','Logo line 2',12],['tagline','Main description',260,true],['primaryButton','Primary button',28],['secondaryButton','Gallery button',28],['stat1Value','Stat 1 value',16],['stat1Label','Stat 1 label',25],['stat2Value','Stat 2 value',16],['stat2Label','Stat 2 label',25],['stat3Value','Stat 3 value',16],['stat3Label','Stat 3 label',25],['stat4Value','Stat 4 value',16],['stat4Label','Stat 4 label',25]],
+ ticker: [['items','Scrolling genres (separate with |)',220,true]],
+ about: [['kicker','Section label',30],['photoTag','Photo label',35],['heading','Heading',120,true],['paragraph','Story paragraph',420,true],['plateTitle','Nameplate title',35],['plateModel','Model label',35],...Array.from({length:6},(_,i)=>[[`label${i+1}`,`Specification ${i+1} label`,28],[`value${i+1}`,`Specification ${i+1} value`,45]]).flat()],
+ services: [['kicker','Section label',30],['heading','Heading',100],['intro','Introduction',260,true],['panelTitle','Panel title',45],['powerLabel','Power label',24],...Array.from({length:4},(_,i)=>[[`service${i+1}Title`,`Service ${i+1} name`,35],[`service${i+1}Description`,`Service ${i+1} description`,220,true]]).flat()],
+ gallery: [['kicker','Section label',30],['heading','Heading',90],['intro','Introduction',220,true],['empty','Empty-gallery message',90]],
+ booking: [['kicker','Section label',30],['heading','Heading',90],['intro','Introduction',280,true],['phone','Phone number',28],['email','Email address',80],['instagram','Instagram label',40],['ticketTitle','Ticket title',35],['ticketCode','Ticket code',30],...Array.from({length:5},(_,i)=>[[`row${i+1}Label`,`Ticket row ${i+1} label`,35],[`row${i+1}Value`,`Ticket row ${i+1} value`,45]]).flat()],
+ footer: [['brandTop','Brand line 1',12],['brandBottom','Brand line 2',12],['about','About link',18],['services','Services link',18],['gallery','Gallery link',18],['book','Book link',18]],
+};
+
+const SECTION_TITLES = { nav:'Header & Navigation', hero:'Hero', ticker:'Scrolling Music Banner', about:'About / Story', services:'Services', gallery:'Gallery', booking:'Booking', footer:'Footer' };
+
+const ContentField = ({ section, field, value, onChange }) => {
+ const [key,label,max,multiline] = field;
+ const id = `content-${section}-${key}`;
+ const common = { id, value: value ?? '', maxLength:max, onChange:(e)=>onChange(section,key,e.target.value) };
+ return <label className="content-field" htmlFor={id}><span>{label}<small>{String(value ?? '').length}/{max}</small></span>{multiline ? <textarea {...common} rows="3" /> : <input {...common} type="text" />}</label>;
+};
+
+const ContentManager = () => {
+ const [content,setContent] = useState(DEFAULT_SITE_CONTENT);
+ const [saved,setSaved] = useState(DEFAULT_SITE_CONTENT);
+ const [loading,setLoading] = useState(true);
+ const [saving,setSaving] = useState(false);
+ const [message,setMessage] = useState('');
+ const [error,setError] = useState('');
+
+ useEffect(()=>{ (async()=>{ try { const r=await fetch('/api/content',{cache:'no-store'}); const d=await r.json(); if(!r.ok) throw new Error(d.message||'Unable to load content.'); setContent(d.content); setSaved(d.content); } catch(e){setError(e.message);} finally {setLoading(false);} })(); },[]);
+ const update=(section,key,value)=>setContent((current)=>({...current,[section]:{...current[section],[key]:value}}));
+ const reset=()=>{ setContent(saved); setMessage('Unsaved changes reset.'); setError(''); };
+ const save=async()=>{ setSaving(true); setMessage(''); setError(''); try { const r=await fetch('/api/content',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({content})}); const d=await r.json(); if(!r.ok) throw new Error(d.message||'Unable to save content.'); setContent(d.content); setSaved(d.content); setMessage('Website content saved. Refresh the public website to see the changes.'); } catch(e){setError(e.message);} finally {setSaving(false);} };
+ if(loading) return <div className="admin-gallery-loading">Loading website content…</div>;
+ return <div className="content-manager">
+  <div className="admin-gallery-toolbar"><div><h2>Content</h2><p>Edit the words in a visual outline that follows the website from top to bottom. Changes are not live until you save.</p></div><div className="admin-gallery-actions"><button type="button" className="content-reset" onClick={reset} disabled={saving}>Reset unsaved changes</button><button type="button" className="admin-save-order" onClick={save} disabled={saving}>{saving?'Saving…':'Save content'}</button></div></div>
+  {message&&<div className="admin-gallery-toast" role="status">{message}</div>}{error&&<div className="admin-gallery-toast error" role="alert">{error}</div>}
+  <div className="content-site-preview">
+   {Object.entries(CONTENT_FIELDS).map(([section,fields])=><section className={`content-preview-section content-preview-${section}`} key={section}><div className="content-preview-heading"><span>{SECTION_TITLES[section]}</span><small>Website section</small></div><div className="content-fields">{fields.map((field)=><ContentField key={field[0]} section={section} field={field} value={content[section]?.[field[0]]} onChange={update}/>)}</div></section>)}
+  </div>
+  <div className="content-sticky-save"><span>Changes stay private until saved.</span><button type="button" className="admin-save-order" onClick={save} disabled={saving}>{saving?'Saving…':'Save content'}</button></div>
+ </div>;
+};
+
 export const AdminDashboard = () => {
  const [activeTab, setActiveTab] = useState('gallery');
 
@@ -629,11 +675,9 @@ export const AdminDashboard = () => {
      role="tabpanel"
      aria-labelledby={`admin-tab-${activeTab}`}
     >
-     {activeTab === 'gallery' ? (
-      <GalleryManager />
-     ) : (
-      <VideoBackgroundManager />
-     )}
+     {activeTab === 'gallery' && <GalleryManager />}
+     {activeTab === 'videos' && <VideoBackgroundManager />}
+     {activeTab === 'content' && <ContentManager />}
     </div>
    </section>
   </main>

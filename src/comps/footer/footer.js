@@ -1,16 +1,1 @@
-export const Footer = () => (
- <>
-  <div className="hazard"></div>
-  <footer>
-   <div className="wrap footer-grid">
-    <a className="footer-brand" href="/admin" aria-label="Open DJ Volts admin login">DJ<span>VOLTS</span></a>
-    <ul className="footer-links">
-     <li><a href="#about">About</a></li>
-     <li><a href="#services">Services</a></li>
-     <li><a href="#gallery">Gallery</a></li>
-     <li><a href="#book">Book</a></li>
-    </ul>
-   </div>
-  </footer>
- </>
-);
+export const Footer = ({ content }) => <><div className="hazard"></div><footer><div className="wrap footer-grid"><a className="footer-brand" href="/admin" aria-label="Open DJ Volts admin login">{content.brandTop}<span>{content.brandBottom}</span></a><ul className="footer-links"><li><a href="#about">{content.about}</a></li><li><a href="#services">{content.services}</a></li><li><a href="#gallery">{content.gallery}</a></li><li><a href="#book">{content.book}</a></li></ul></div></footer></>;

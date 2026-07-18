@@ -29,7 +29,7 @@ const MediaCard = ({ item, itemKey, onOpen }) => (
   </button>
 );
 
-export const Gallery = ({ mediaItems }) => {
+export const Gallery = ({ mediaItems, content }) => {
  const [selectedIndex, setSelectedIndex] = useState(null);
  const [isInteracting, setIsInteracting] = useState(false);
  const [isPageVisible, setIsPageVisible] = useState(true);
@@ -293,9 +293,9 @@ export const Gallery = ({ mediaItems }) => {
    <section className="gallery" id="gallery">
     <div className="wrap">
      <div className="section-head gallery-heading">
-      <span className="kicker">Gallery</span>
-      <h2>From the booth & dance floor</h2>
-      <p>Photos and live footage from recent sets — click any moment to see it full size.</p>
+      <span className="kicker">{content.kicker}</span>
+      <h2>{content.heading}</h2>
+      <p>{content.intro}</p>
      </div>
 
      {mediaItems.length > 0 ? (
@@ -328,7 +328,7 @@ export const Gallery = ({ mediaItems }) => {
        {mediaItems.length > 1 && <button type="button" className="media-gallery-arrow media-gallery-next" onClick={() => nudgeGallery(1)} aria-label="Scroll gallery right">›</button>}
       </div>
      ) : (
-      <p className="media-gallery-empty">Gallery media is coming soon.</p>
+      <p className="media-gallery-empty">{content.empty}</p>
      )}
     </div>
    </section>

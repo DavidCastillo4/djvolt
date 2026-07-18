@@ -7,19 +7,12 @@ import { Hero } from '@/comps/hero/hero';
 import { Services } from '@/comps/services/services';
 import { Ticker } from '@/comps/ticker/ticker';
 
-export const Djvolts = ({ galleryMedia }) => (
+export const Djvolts = ({ galleryMedia, content }) => (
  <>
-  <Hero />
-  <div className="dance-stage">
-   <DanceBackground />
-   <main className="dance-stage-content">
-    <Ticker />
-    <About />
-    <Services />
-    <Gallery mediaItems={galleryMedia} />
-    <Booking />
-   </main>
-   <Footer />
-  </div>
+  <Hero content={content.hero} />
+  <div className="dance-stage"><DanceBackground /><main className="dance-stage-content">
+   <Ticker content={content.ticker} /><About content={content.about} /><Services content={content.services} />
+   <Gallery mediaItems={galleryMedia} content={content.gallery} /><Booking content={content.booking} />
+  </main><Footer content={content.footer} /></div>
  </>
 );

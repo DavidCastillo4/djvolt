@@ -1,33 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-
-export const About = () => (
- <section className="about" id="about">
-  <div className="wrap">
-   <span className="kicker">The Story</span>
-   <div className="about-grid">
-    <div className="about-photo">
-     <img src="/api/images/by-name/about-portrait.jpg" alt="DJ Volts working the booth at a live event" />
-     <div className="tag">120V &amp; PROUD OF IT</div>
-    </div>
-    <div className="about-copy">
-     <h2>Two trades. One guy who shows up early and checks his own wiring</h2>
-     <p>By day, he&apos;s out running conduit and troubleshooting panels. By night, he&apos;s behind the decks — same instinct for making sure everything&apos;s connected right, just with a lot more bass.</p>
-     <div className="nameplate">
-      <div className="nameplate-head">
-       <span>Equipment Nameplate</span>
-       <span>MODEL: VOLTS-01</span>
-      </div>
-      <div className="nameplate-grid">
-       <div><label>Genres</label><strong>Spanish / Country / Top 40</strong></div>
-       <div><label>Setup Time</label><strong>45–60 min</strong></div>
-       <div><label>Sound Output</label><strong>2x Pro Line Array</strong></div>
-       <div><label>Lighting</label><strong>Uplights + Lasers</strong></div>
-       <div><label>Day Job</label><strong>Licensed Electrician</strong></div>
-       <div><label>Drink Of Choice</label><strong>Old Fashioned</strong></div>
-      </div>
-     </div>
-    </div>
-   </div>
-  </div>
- </section>
-);
+export const About = ({ content }) => {
+ const specs = [1,2,3,4,5,6].map((n) => ({ label: content[`label${n}`], value: content[`value${n}`] }));
+ return <section className="about" id="about"><div className="wrap"><span className="kicker">{content.kicker}</span><div className="about-grid">
+  <div className="about-photo"><img src="/api/images/by-name/about-portrait.jpg" alt="DJ Volts working the booth at a live event" /><div className="tag">{content.photoTag}</div></div>
+  <div className="about-copy"><h2>{content.heading}</h2><p>{content.paragraph}</p><div className="nameplate"><div className="nameplate-head"><span>{content.plateTitle}</span><span>{content.plateModel}</span></div><div className="nameplate-grid">{specs.map((s, i) => <div key={i}><label>{s.label}</label><strong>{s.value}</strong></div>)}</div></div></div>
+ </div></div></section>;
+};
