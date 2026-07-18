@@ -601,19 +601,39 @@ const VideoBackgroundManager = () => {
 const CONTENT_FIELDS = {
  nav: [['about','About link',18],['services','Services link',18],['gallery','Gallery link',18],['book','Book link',18],['cta','Quote button',24]],
  hero: [['eyebrow','Booking banner',55],['titleTop','Logo line 1',12],['titleBottom','Logo line 2',12],['tagline','Main description',260,true],['primaryButton','Primary button',28],['secondaryButton','Gallery button',28],['stat1Value','Stat 1 value',16],['stat1Label','Stat 1 label',25],['stat2Value','Stat 2 value',16],['stat2Label','Stat 2 label',25],['stat3Value','Stat 3 value',16],['stat3Label','Stat 3 label',25],['stat4Value','Stat 4 value',16],['stat4Label','Stat 4 label',25]],
- ticker: [['items','Scrolling genres (separate with |)',220,true]],
+ ticker: [['items','Scrolling genres (separate with |)',220,true],['speed','Scrolling speed',0,false,'speed']],
  about: [['kicker','Section label',30],['photoTag','Photo label',35],['heading','Heading',120,true],['paragraph','Story paragraph',420,true],['plateTitle','Nameplate title',35],['plateModel','Model label',35],...Array.from({length:6},(_,i)=>[[`label${i+1}`,`Specification ${i+1} label`,28],[`value${i+1}`,`Specification ${i+1} value`,45]]).flat()],
  services: [['kicker','Section label',30],['heading','Heading',100],['intro','Introduction',260,true],['panelTitle','Panel title',45],['powerLabel','Power label',24],...Array.from({length:4},(_,i)=>[[`service${i+1}Title`,`Service ${i+1} name`,35],[`service${i+1}Description`,`Service ${i+1} description`,220,true]]).flat()],
- gallery: [['kicker','Section label',30],['heading','Heading',90],['intro','Introduction',220,true],['empty','Empty-gallery message',90]],
+ gallery: [['kicker','Section label',30],['heading','Heading',90],['intro','Introduction',220,true]],
  booking: [['kicker','Section label',30],['heading','Heading',90],['intro','Introduction',280,true],['phone','Phone number',28],['email','Email address',80],['instagram','Instagram label',40],['ticketTitle','Ticket title',35],['ticketCode','Ticket code',30],...Array.from({length:5},(_,i)=>[[`row${i+1}Label`,`Ticket row ${i+1} label`,35],[`row${i+1}Value`,`Ticket row ${i+1} value`,45]]).flat()],
  footer: [['brandTop','Brand line 1',12],['brandBottom','Brand line 2',12],['about','About link',18],['services','Services link',18],['gallery','Gallery link',18],['book','Book link',18]],
 };
 
 const SECTION_TITLES = { nav:'Header & Navigation', hero:'Hero', ticker:'Scrolling Music Banner', about:'About / Story', services:'Services', gallery:'Gallery', booking:'Booking', footer:'Footer' };
 
+const TICKER_SPEED_OPTIONS = [
+ ['48', 'Very slow'],
+ ['40', 'Slow'],
+ ['32', 'Normal'],
+ ['24', 'Fast'],
+ ['18', 'Very fast'],
+];
+
 const ContentField = ({ section, field, value, onChange }) => {
- const [key,label,max,multiline] = field;
+ const [key,label,max,multiline,type] = field;
  const id = `content-${section}-${key}`;
+
+ if (type === 'speed') {
+  return (
+   <label className="content-field content-field-select" htmlFor={id}>
+    <span>{label}<small>Lower seconds = faster</small></span>
+    <select id={id} value={String(value ?? '32')} onChange={(e)=>onChange(section,key,e.target.value)}>
+     {TICKER_SPEED_OPTIONS.map(([seconds, name]) => <option key={seconds} value={seconds}>{name} — {seconds} seconds</option>)}
+    </select>
+   </label>
+  );
+ }
+
  const common = { id, value: value ?? '', maxLength:max, onChange:(e)=>onChange(section,key,e.target.value) };
  return <label className="content-field" htmlFor={id}><span>{label}<small>{String(value ?? '').length}/{max}</small></span>{multiline ? <textarea {...common} rows="3" /> : <input {...common} type="text" />}</label>;
 };

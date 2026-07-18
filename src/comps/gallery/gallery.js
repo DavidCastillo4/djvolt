@@ -298,7 +298,7 @@ export const Gallery = ({ mediaItems, content }) => {
       <p>{content.intro}</p>
      </div>
 
-     {mediaItems.length > 0 ? (
+     {mediaItems.length > 0 && (
       <div className="media-gallery-shell">
        {mediaItems.length > 1 && <button type="button" className="media-gallery-arrow media-gallery-prev" onClick={() => nudgeGallery(-1)} aria-label="Scroll gallery left">‹</button>}
        <div
@@ -327,8 +327,6 @@ export const Gallery = ({ mediaItems, content }) => {
        </div>
        {mediaItems.length > 1 && <button type="button" className="media-gallery-arrow media-gallery-next" onClick={() => nudgeGallery(1)} aria-label="Scroll gallery right">›</button>}
       </div>
-     ) : (
-      <p className="media-gallery-empty">{content.empty}</p>
      )}
     </div>
    </section>

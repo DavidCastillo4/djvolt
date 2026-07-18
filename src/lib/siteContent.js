@@ -7,7 +7,7 @@ export const DEFAULT_SITE_CONTENT = {
   stat1Value: '250+', stat1Label: 'Events Wired', stat2Value: 'Bilingual', stat2Label: 'English - Spanish',
   stat3Value: '2', stat3Label: 'Pro Speaker Rigs', stat4Value: 'Vibe', stat4Label: 'Lights & Smoke'
  },
- ticker: { items: 'COUNTRY|TOP 40|CLASSIC ROCK|LINE DANCE ANTHEMS|WEDDING FIRST DANCES|HONKY TONK|SPANISH' },
+ ticker: { items: 'COUNTRY|TOP 40|CLASSIC ROCK|LINE DANCE ANTHEMS|WEDDING FIRST DANCES|HONKY TONK|SPANISH', speed: '32' },
  about: {
   kicker: 'The Story', photoTag: '120V & PROUD OF IT', heading: 'Two trades. One guy who shows up early and checks his own wiring',
   paragraph: "By day, he's out running conduit and troubleshooting panels. By night, he's behind the decks — same instinct for making sure everything's connected right, just with a lot more bass.",
@@ -25,7 +25,7 @@ export const DEFAULT_SITE_CONTENT = {
   service3Title: 'Bars & Breweries', service3Description: 'Line dance nights, live trivia breaks, and sets that keep a bar crowd on their feet until close.',
   service4Title: 'Corporate & Company', service4Description: 'Company parties and events with clean sound, tasteful lighting, and a set list that fits the crowd.'
  },
- gallery: { kicker: 'Gallery', heading: 'From the booth & dance floor', intro: 'Photos and live footage from recent sets — click any moment to see it full size.', empty: 'Gallery media is coming soon.' },
+ gallery: { kicker: 'Gallery', heading: 'From the booth & dance floor', intro: 'Photos and live footage from recent sets — click any moment to see it full size.' },
  booking: {
   kicker: 'Booking', heading: "Let's wire up your event", intro: "Reach out with your date, venue and headcount, and you'll get a straight answer on availability and pricing — no runaround.",
   phone: '(512) 557-5987', email: 'info@djvolts.com', instagram: '@djvolts2025',
@@ -40,7 +40,9 @@ export const DEFAULT_SITE_CONTENT = {
 export function mergeSiteContent(saved = {}) {
  const merged = {};
  for (const [section, defaults] of Object.entries(DEFAULT_SITE_CONTENT)) {
-  merged[section] = { ...defaults, ...(saved?.[section] || {}) };
+  merged[section] = Object.fromEntries(
+   Object.keys(defaults).map((key) => [key, saved?.[section]?.[key] ?? defaults[key]])
+  );
  }
  return merged;
 }

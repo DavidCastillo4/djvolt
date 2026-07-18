@@ -388,7 +388,7 @@ h1.wordmark span {
 
 .ticker-track {
  display: inline-flex;
- animation: scroll 32s linear infinite;
+ animation: scroll var(--ticker-speed, 32s) linear infinite;
 }
 
 .ticker-track span {
@@ -850,11 +850,6 @@ h2 {
 
 .media-gallery-next {
  right: -18px;
-}
-
-.media-gallery-empty {
- margin: 0;
- color: var(--cream-dim);
 }
 
 /* ---------- mixed media viewer ---------- */
@@ -2366,8 +2361,11 @@ footer {
 .content-field { display:grid; gap:7px; min-width:0; }
 .content-field > span { display:flex; justify-content:space-between; gap:10px; color:var(--cream-dim); font-size:.82rem; font-weight:700; }
 .content-field small { color:rgba(255,255,255,.42); font-weight:400; }
-.content-field input,.content-field textarea { width:100%; border:1px solid rgba(var(--amber-rgb),.24); border-radius:5px; background:rgba(7,5,3,.58); color:var(--cream); padding:11px 12px; font:inherit; resize:vertical; }
-.content-field input:focus,.content-field textarea:focus { outline:2px solid rgba(var(--amber-rgb),.35); border-color:var(--amber); }
+.content-field input,.content-field textarea,.content-field select { width:100%; border:1px solid rgba(var(--amber-rgb),.24); border-radius:5px; background:rgba(7,5,3,.58); color:var(--cream); padding:11px 12px; font:inherit; resize:vertical; }
+.content-field input:focus,.content-field textarea:focus,.content-field select:focus { outline:2px solid rgba(var(--amber-rgb),.35); border-color:var(--amber); }
+
+.content-field select { appearance:auto; cursor:pointer; }
+.content-field-select { align-self:start; }
 .content-field:has(textarea) { grid-column:1/-1; }
 .content-sticky-save { position:sticky; bottom:12px; z-index:4; display:flex; align-items:center; justify-content:space-between; gap:18px; margin-top:18px; padding:13px 16px; border:1px solid var(--wood-line); border-radius:8px; background:rgba(17,11,7,.96); box-shadow:0 10px 30px rgba(0,0,0,.4); color:var(--cream-dim); }
 @media (max-width:760px){ .content-fields{grid-template-columns:1fr}.content-field:has(textarea){grid-column:auto}.content-sticky-save span{display:none}.content-sticky-save button{width:100%} }
