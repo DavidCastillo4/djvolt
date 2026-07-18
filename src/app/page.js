@@ -9,11 +9,13 @@ async function getGalleryMedia() {
   const media = await sql`
    SELECT imgpk AS id, 'image' AS type, sortid
    FROM img
+   WHERE COALESCE(isgallery, TRUE) = TRUE
 
    UNION ALL
 
    SELECT vidpk AS id, 'video' AS type, sortid
    FROM vid
+   WHERE COALESCE(isgallery, TRUE) = TRUE
 
    ORDER BY sortid, type, id
   `;
