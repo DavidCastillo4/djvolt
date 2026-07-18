@@ -395,6 +395,206 @@ const GalleryManager = () => {
  );
 };
 
+
+const captureVideoPoster = (src) => new Promise((resolve, reject) => {
+ const video = document.createElement('video');
+ let settled = false;
+
+ const finish = (callback, value) => {
+  if (settled) return;
+  settled = true;
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+  callback(value);
+ };
+
+ const fail = () => finish(reject, new Error('A poster frame could not be created from one of the selected videos.'));
+ const timeout = window.setTimeout(fail, 12000);
+
+ video.muted = true;
+ video.playsInline = true;
+ video.preload = 'auto';
+
+ video.addEventListener('error', () => {
+  window.clearTimeout(timeout);
+  fail();
+ }, { once: true });
+
+ video.addEventListener('loadedmetadata', () => {
+  const duration = Number.isFinite(video.duration) ? video.duration : 0;
+  video.currentTime = duration > 0 ? Math.min(1, Math.max(0.05, duration * 0.1)) : 0;
+ }, { once: true });
+
+ video.addEventListener('seeked', () => {
+  try {
+   const sourceWidth = video.videoWidth;
+   const sourceHeight = video.videoHeight;
+   if (!sourceWidth || !sourceHeight) throw new Error('Video dimensions are unavailable.');
+
+   const maxWidth = 1280;
+   const scale = Math.min(1, maxWidth / sourceWidth);
+   const canvas = document.createElement('canvas');
+   canvas.width = Math.max(1, Math.round(sourceWidth * scale));
+   canvas.height = Math.max(1, Math.round(sourceHeight * scale));
+
+   const context = canvas.getContext('2d');
+   if (!context) throw new Error('Poster canvas is unavailable.');
+   context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+   const dataUrl = canvas.toDataURL('image/jpeg', 0.82);
+   window.clearTimeout(timeout);
+   finish(resolve, dataUrl);
+  } catch {
+   window.clearTimeout(timeout);
+   fail();
+  }
+ }, { once: true });
+
+ video.src = src;
+ video.load();
+});
+
+const VideoBackgroundManager = () => {
+ const [videos, setVideos] = useState([]);
+ const [heroId, setHeroId] = useState(null);
+ const [backgroundId, setBackgroundId] = useState(null);
+ const [loading, setLoading] = useState(true);
+ const [saving, setSaving] = useState(false);
+ const [message, setMessage] = useState('');
+ const [error, setError] = useState('');
+
+ const loadVideos = useCallback(async () => {
+  setLoading(true);
+  setError('');
+
+  try {
+   const response = await fetch('/api/admin/video-backgrounds', { cache: 'no-store' });
+   const data = await response.json();
+   if (!response.ok) throw new Error(data.message || 'Unable to load the videos.');
+
+   const nextVideos = data.videos || [];
+   setVideos(nextVideos);
+   setHeroId(nextVideos.find((video) => video.isHero)?.id ?? null);
+   setBackgroundId(nextVideos.find((video) => video.isBackground)?.id ?? null);
+  } catch (loadError) {
+   setError(loadError.message);
+  } finally {
+   setLoading(false);
+  }
+ }, []);
+
+ useEffect(() => {
+  loadVideos();
+ }, [loadVideos]);
+
+ useEffect(() => {
+  if (!message) return undefined;
+  const timer = window.setTimeout(() => setMessage(''), 3200);
+  return () => window.clearTimeout(timer);
+ }, [message]);
+
+ useEffect(() => {
+  if (!error) return undefined;
+  const timer = window.setTimeout(() => setError(''), 5000);
+  return () => window.clearTimeout(timer);
+ }, [error]);
+
+ const saveSelections = async () => {
+  if (!heroId || !backgroundId) {
+   setError('Choose both a hero video and a page-background video.');
+   return;
+  }
+
+  const heroVideo = videos.find((video) => video.id === heroId);
+  const backgroundVideo = videos.find((video) => video.id === backgroundId);
+  if (!heroVideo || !backgroundVideo) {
+   setError('One of the selected videos could not be found.');
+   return;
+  }
+
+  setSaving(true);
+  setError('');
+  setMessage('');
+
+  try {
+   const heroPoster = await captureVideoPoster(heroVideo.src);
+   const backgroundPoster = heroId === backgroundId
+    ? heroPoster
+    : await captureVideoPoster(backgroundVideo.src);
+
+   const response = await fetch('/api/admin/video-backgrounds', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ heroId, backgroundId, heroPoster, backgroundPoster }),
+   });
+   const data = await response.json();
+   if (!response.ok) throw new Error(data.message || 'Unable to save the video backgrounds.');
+
+   setVideos((current) => current.map((video) => ({
+    ...video,
+    isHero: video.id === heroId,
+    isBackground: video.id === backgroundId,
+   })));
+   setMessage('Video backgrounds and poster images saved.');
+  } catch (saveError) {
+   setError(saveError.message);
+  } finally {
+   setSaving(false);
+  }
+ };
+
+ return (
+  <div className="admin-video-background-manager">
+   <div className="admin-gallery-toolbar">
+    <div>
+     <h2>Video Backgrounds</h2>
+     <p>Choose the video used in the hero and the video used behind the rest of the page. The same video may be used for both.</p>
+    </div>
+    <div className="admin-gallery-actions">
+     <button type="button" className="admin-save-order" disabled={saving || loading || videos.length === 0} onClick={saveSelections}>
+      {saving ? 'Creating posters…' : 'Save backgrounds'}
+     </button>
+    </div>
+   </div>
+
+   {message && <div className="admin-gallery-toast" role="status" aria-live="polite">{message}</div>}
+   {error && <div className="admin-gallery-toast error" role="alert" aria-live="assertive">{error}</div>}
+
+   {loading ? (
+    <div className="admin-gallery-loading">Loading videos…</div>
+   ) : videos.length === 0 ? (
+    <div className="admin-gallery-empty">No videos have been uploaded yet.</div>
+   ) : (
+    <div className="admin-video-background-grid">
+     {videos.map((video, index) => (
+      <article key={video.id} className={`admin-background-tile${heroId === video.id || backgroundId === video.id ? ' selected' : ''}`}>
+       <div className="admin-media-preview">
+        <video src={video.src} muted playsInline preload="metadata" controls />
+        <span className="admin-background-number">{index + 1}</span>
+        <div className="admin-media-badges">
+         {heroId === video.id && <span>Hero video</span>}
+         {backgroundId === video.id && <span>Page background</span>}
+        </div>
+       </div>
+       <div className="admin-background-choices">
+        <label>
+         <input type="radio" name="hero-video" checked={heroId === video.id} onChange={() => setHeroId(video.id)} />
+         <span>Hero</span>
+        </label>
+        <label>
+         <input type="radio" name="background-video" checked={backgroundId === video.id} onChange={() => setBackgroundId(video.id)} />
+         <span>Background</span>
+        </label>
+       </div>
+      </article>
+     ))}
+    </div>
+   )}
+  </div>
+ );
+};
+
 export const AdminDashboard = () => {
  const [activeTab, setActiveTab] = useState('gallery');
 
@@ -432,10 +632,7 @@ export const AdminDashboard = () => {
      {activeTab === 'gallery' ? (
       <GalleryManager />
      ) : (
-      <div className="admin-placeholder">
-       <h2>Video Backgrounds</h2>
-       <p>Hero and page-background video controls will be built here separately.</p>
-      </div>
+      <VideoBackgroundManager />
      )}
     </div>
    </section>

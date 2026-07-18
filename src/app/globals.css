@@ -2261,3 +2261,99 @@ footer {
  background: rgba(98, 34, 27, .97);
  color: #ffd7ce;
 }
+
+/* ---------- admin video backgrounds ---------- */
+.admin-video-background-manager {
+ display: grid;
+ gap: 22px;
+}
+
+.admin-video-background-grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+ gap: 18px;
+}
+
+.admin-background-tile {
+ min-width: 0;
+ overflow: hidden;
+ border: 1px solid var(--wood-line);
+ border-radius: 7px;
+ background: var(--panel-2);
+ box-shadow: 0 12px 28px rgba(0, 0, 0, .24);
+ transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.admin-background-tile.selected {
+ border-color: var(--amber);
+ box-shadow: 0 0 0 1px rgba(var(--amber-rgb), .24), 0 12px 28px rgba(0, 0, 0, .28);
+}
+
+.admin-background-number {
+ position: absolute;
+ left: 9px;
+ bottom: 9px;
+ display: grid;
+ place-items: center;
+ min-width: 29px;
+ height: 29px;
+ padding: 0 7px;
+ border-radius: 50%;
+ background: rgba(0, 0, 0, .76);
+ color: #fff;
+ font-family: var(--head);
+ font-weight: 700;
+ line-height: 1;
+}
+
+.admin-background-choices {
+ display: grid;
+ grid-template-columns: 1fr 1fr;
+ border-top: 1px solid var(--wood-line);
+}
+
+.admin-background-choices label {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 9px;
+ min-height: 52px;
+ padding: 12px;
+ cursor: pointer;
+ color: var(--cream-dim);
+ font-family: var(--head);
+ font-size: .85rem;
+ font-weight: 700;
+ letter-spacing: .6px;
+ text-transform: uppercase;
+}
+
+.admin-background-choices label + label {
+ border-left: 1px solid var(--wood-line);
+}
+
+.admin-background-choices label:has(input:checked) {
+ background: rgba(var(--amber-rgb), .1);
+ color: var(--cream);
+}
+
+.admin-background-choices input {
+ width: 18px;
+ height: 18px;
+ margin: 0;
+ accent-color: var(--volt);
+ cursor: pointer;
+}
+
+@media (max-width: 760px) {
+ .admin-video-background-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+ }
+}
+
+@media (max-width: 480px) {
+ .admin-video-background-grid {
+  grid-template-columns: 1fr;
+ }
+}

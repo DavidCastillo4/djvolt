@@ -109,7 +109,7 @@ export async function GET(request, { params }) {
      'Content-Type': video.vidtype,
      'Content-Length': String(videoBuffer.length),
      'Accept-Ranges': 'bytes',
-     'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+     'Cache-Control': 'no-store',
     },
    });
   }
@@ -129,7 +129,7 @@ export async function GET(request, { params }) {
     'Content-Length': String(videoChunk.length),
     'Content-Range': `bytes ${range.start}-${range.end}/${totalSize}`,
     'Accept-Ranges': 'bytes',
-    'Cache-Control': 'public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800',
+    'Cache-Control': 'no-store',
    },
   });
  } catch (error) {
