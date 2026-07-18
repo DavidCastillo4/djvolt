@@ -4,7 +4,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 const TABS = [
- { id: 'dashboard', label: 'Dashboard' },
  { id: 'gallery', label: 'Gallery' },
  { id: 'videos', label: 'Video Backgrounds' },
 ];
@@ -17,6 +16,8 @@ const GalleryManager = () => {
  const [message, setMessage] = useState('');
  const [error, setError] = useState('');
  const [draggedKey, setDraggedKey] = useState(null);
+ const [pendingDelete, setPendingDelete] = useState(null);
+ const [deleting, setDeleting] = useState(false);
  const fileInputRef = useRef(null);
 
  const loadItems = useCallback(async () => {
@@ -139,11 +140,27 @@ const GalleryManager = () => {
   }
  };
 
- const deleteItem = async (item) => {
-  if (item.isHero || item.isBackground) return;
-  const confirmed = window.confirm(`Delete ${item.type === 'video' ? 'this video' : item.name}? This cannot be undone.`);
-  if (!confirmed) return;
+ useEffect(() => {
+  if (!pendingDelete) return undefined;
 
+  const closeOnEscape = (event) => {
+   if (event.key === 'Escape' && !deleting) setPendingDelete(null);
+  };
+
+  window.addEventListener('keydown', closeOnEscape);
+  return () => window.removeEventListener('keydown', closeOnEscape);
+ }, [pendingDelete, deleting]);
+
+ const requestDelete = (item) => {
+  if (item.isHero || item.isBackground) return;
+  setPendingDelete(item);
+ };
+
+ const deleteItem = async () => {
+  if (!pendingDelete || pendingDelete.isHero || pendingDelete.isBackground) return;
+
+  const item = pendingDelete;
+  setDeleting(true);
   setError('');
   setMessage('');
 
@@ -157,9 +174,12 @@ const GalleryManager = () => {
    if (!response.ok) throw new Error(data.message || 'Unable to delete this item.');
 
    setItems((current) => current.filter((candidate) => candidate.key !== item.key));
+   setPendingDelete(null);
    setMessage('Gallery item deleted. Save the order when you are finished.');
   } catch (deleteError) {
    setError(deleteError.message);
+  } finally {
+   setDeleting(false);
   }
  };
 
@@ -167,8 +187,7 @@ const GalleryManager = () => {
   <div className="admin-gallery-manager">
    <div className="admin-gallery-toolbar">
     <div>
-     <h2>Gallery</h2>
-     <p>Upload, hide, delete, and drag media into the order it should appear on the website.</p>
+     <p>Upload, hide, delete, and drag media into the order it should appear on the website</p>
     </div>
     <div className="admin-gallery-actions">
      <label className={`admin-upload-button${uploading ? ' disabled' : ''}`}>
@@ -250,16 +269,47 @@ const GalleryManager = () => {
            className="delete"
            disabled={protectedVideo}
            title={protectedVideo ? 'Choose another website background before deleting this video.' : 'Delete this item'}
-           onClick={() => deleteItem(item)}
+           onClick={() => requestDelete(item)}
           >
            Delete
           </button>
          </div>
-         {protectedVideo && <small>This video is protected because the website is using it.</small>}
+         {protectedVideo && <small>Protected background video</small>}
         </div>
        </article>
       );
      })}
+    </div>
+   )}
+
+   {pendingDelete && (
+    <div
+     className="admin-confirm-overlay"
+     role="presentation"
+     onMouseDown={(event) => {
+      if (event.target === event.currentTarget && !deleting) setPendingDelete(null);
+     }}
+    >
+     <section
+      className="admin-confirm-modal"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="delete-media-title"
+      aria-describedby="delete-media-description"
+     >
+      <h2 id="delete-media-title">Delete media?</h2>
+      <p id="delete-media-description">
+       Delete <strong>{pendingDelete.name}</strong>? This action cannot be undone.
+      </p>
+      <div className="admin-confirm-actions">
+       <button type="button" className="cancel" autoFocus disabled={deleting} onClick={() => setPendingDelete(null)}>
+        Cancel
+       </button>
+       <button type="button" className="confirm-delete" disabled={deleting} onClick={deleteItem}>
+        {deleting ? 'Deleting…' : 'Delete'}
+       </button>
+      </div>
+     </section>
     </div>
    )}
   </div>
@@ -267,13 +317,12 @@ const GalleryManager = () => {
 };
 
 export const AdminDashboard = () => {
- const [activeTab, setActiveTab] = useState('dashboard');
+ const [activeTab, setActiveTab] = useState('gallery');
 
  return (
   <main className="admin-dashboard-page">
    <section className="admin-dashboard-shell" aria-labelledby="admin-dashboard-title">
-    <header className="admin-dashboard-header">
-     <span className="admin-kicker">DJ Volts Administration</span>
+    <header className="admin-dashboard-header">     
      <h1 id="admin-dashboard-title">Admin Dashboard</h1>
     </header>
 
@@ -305,10 +354,8 @@ export const AdminDashboard = () => {
       <GalleryManager />
      ) : (
       <div className="admin-placeholder">
-       <h2>{activeTab === 'dashboard' ? 'Dashboard' : 'Video Backgrounds'}</h2>
-       <p>{activeTab === 'dashboard'
-        ? 'Administrative tools and site controls will be added here.'
-        : 'Hero and page-background video controls will be built here separately.'}</p>
+       <h2>Video Backgrounds</h2>
+       <p>Hero and page-background video controls will be built here separately.</p>
       </div>
      )}
     </div>

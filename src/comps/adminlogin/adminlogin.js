@@ -39,10 +39,7 @@ export const AdminLogin = () => {
  return (
   <main className="admin-login-page">
    <section className="admin-login-card" aria-labelledby="admin-login-title">
-    <span className="admin-kicker">DJ Volts</span>
     <h1 id="admin-login-title">Admin Login</h1>
-    <p>Enter the admin password to continue.</p>
-
     <form onSubmit={handleSubmit} className="admin-login-form">
      <label htmlFor="admin-password">Password</label>
      <input

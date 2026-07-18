@@ -1399,7 +1399,7 @@ footer {
 .admin-login-page,
 .admin-dashboard-page {
  min-height: calc(100vh - 173px);
- padding: 72px 28px;
+ padding: 28px 28px 72px;
  background:
   radial-gradient(circle at top, rgba(var(--amber-rgb), 0.12), transparent 36%),
   var(--ink);
@@ -1507,7 +1507,7 @@ footer {
 }
 
 .admin-dashboard-header {
- padding: 28px 32px;
+ padding: 12px 32px 10px;
  border-bottom: 1px solid var(--wood-line);
 }
 
@@ -1566,14 +1566,17 @@ footer {
 
  .admin-login-page,
  .admin-dashboard-page {
-  padding: 40px 16px;
+  padding: 24px 16px 40px;
  }
 
  .admin-login-card {
   padding: 28px 22px;
  }
 
- .admin-dashboard-header,
+ .admin-dashboard-header {
+  padding: 10px 20px 8px;
+ }
+
  .admin-tab-content {
   padding: 24px 20px;
  }
@@ -2144,4 +2147,89 @@ footer {
  .admin-media-grid {
   grid-template-columns: 1fr;
  }
+}
+
+/* ---------- admin confirmation modal ---------- */
+.admin-confirm-overlay {
+ position: fixed;
+ inset: 0;
+ z-index: 1000;
+ display: grid;
+ place-items: center;
+ padding: 20px;
+ background: rgba(0, 0, 0, .72);
+ backdrop-filter: blur(3px);
+ animation: admin-modal-fade .16s ease-out;
+}
+
+.admin-confirm-modal {
+ width: min(100%, 430px);
+ padding: 24px;
+ border: 1px solid var(--wood-line);
+ border-radius: 8px;
+ background: var(--panel);
+ box-shadow: 0 24px 70px rgba(0, 0, 0, .55);
+ animation: admin-modal-rise .18s ease-out;
+}
+
+.admin-confirm-modal h2 {
+ margin: 0 0 10px;
+ font-family: var(--head);
+ font-size: 1.45rem;
+}
+
+.admin-confirm-modal p {
+ margin: 0;
+ color: var(--cream-dim);
+ line-height: 1.55;
+ overflow-wrap: anywhere;
+}
+
+.admin-confirm-modal strong {
+ color: var(--cream);
+}
+
+.admin-confirm-actions {
+ display: flex;
+ justify-content: flex-end;
+ gap: 10px;
+ margin-top: 24px;
+}
+
+.admin-confirm-actions button {
+ min-width: 96px;
+ padding: 11px 16px;
+ border-radius: 4px;
+ cursor: pointer;
+ font-family: var(--head);
+ font-weight: 700;
+ letter-spacing: .6px;
+ text-transform: uppercase;
+}
+
+.admin-confirm-actions button:disabled {
+ cursor: wait;
+ opacity: .6;
+}
+
+.admin-confirm-actions .cancel {
+ border: 1px solid var(--wood-line);
+ background: var(--panel-2);
+ color: var(--cream);
+}
+
+.admin-confirm-actions .confirm-delete {
+ border: 1px solid rgba(255, 120, 90, .45);
+ background: rgba(135, 47, 34, .5);
+ color: #ffd1c4;
+}
+
+@keyframes admin-modal-fade {
+ from { opacity: 0; }
+ to { opacity: 1; }
+}
+
+@keyframes admin-modal-rise {
+ from { opacity: 0; transform: translateY(8px) scale(.985); }
+ to { opacity: 1; transform: translateY(0) scale(1); }
 }
