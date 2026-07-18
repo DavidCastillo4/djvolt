@@ -18,13 +18,18 @@ const MediaCard = ({ item, itemKey, onOpen, shouldPlay }) => {
 
   const observer = new IntersectionObserver(
    ([entry]) => {
-    if (entry.isIntersecting && entry.intersectionRatio >= 0.6 && shouldPlay) {
+    if (entry.isIntersecting && shouldPlay) {
      video.play().catch(() => {});
     } else {
      video.pause();
     }
    },
-   { threshold: [0, 0.6, 1] },
+   {
+    threshold: 0,
+    // Begin playback just before the card enters the visible screen so mobile
+    // visitors do not see a black frame while the gallery is moving.
+    rootMargin: '0px 25% 0px 25%',
+   },
   );
 
   observer.observe(card);
@@ -54,7 +59,7 @@ const MediaCard = ({ item, itemKey, onOpen, shouldPlay }) => {
      muted
      loop
      playsInline
-     preload="none"
+     preload="auto"
      aria-hidden="true"
     />
    ) : (
@@ -191,10 +196,30 @@ export const Gallery = ({ mediaItems }) => {
   const track = trackRef.current;
   if (!track) return;
 
+  const cards = Array.from(track.querySelectorAll('.media-card'));
+  if (cards.length === 0) return;
+
   pauseThenResume();
-  const card = track.querySelector('.media-card');
-  const distance = card ? card.getBoundingClientRect().width + 16 : 340;
-  track.scrollBy({ left: distance * direction, behavior: 'smooth' });
+
+  const viewportCenter = track.scrollLeft + (track.clientWidth / 2);
+  let closestIndex = 0;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  cards.forEach((card, index) => {
+   const cardCenter = card.offsetLeft + (card.offsetWidth / 2);
+   const distance = Math.abs(cardCenter - viewportCenter);
+   if (distance < closestDistance) {
+    closestDistance = distance;
+    closestIndex = index;
+   }
+  });
+
+  const targetIndex = Math.max(0, Math.min(cards.length - 1, closestIndex + direction));
+  const targetCard = cards[targetIndex];
+  const targetLeft = targetCard.offsetLeft + (targetCard.offsetWidth / 2) - (track.clientWidth / 2);
+
+  scrollPositionRef.current = targetLeft;
+  track.scrollTo({ left: targetLeft, behavior: 'smooth' });
  };
 
  useEffect(() => () => window.clearTimeout(resumeTimerRef.current), []);
