@@ -832,3 +832,128 @@
   padding:24px 20px;
  }
 }
+
+/* ---------- continuous dancing-video experience ---------- */
+.dance-stage{
+  position:relative;
+  isolation:isolate;
+  overflow:clip;
+  background:#120c08;
+}
+
+.dance-background{
+  position:absolute;
+  inset:0;
+  z-index:-3;
+  overflow:hidden;
+  clip-path:inset(0);
+  background:
+    radial-gradient(circle at 78% 18%, rgba(var(--amber-rgb),.12), transparent 34%),
+    #120c08;
+}
+
+.dance-background video{
+  position:fixed;
+  top:var(--site-header-height);
+  left:0;
+  width:100vw;
+  height:calc(100vh - var(--site-header-height));
+  object-fit:cover;
+  opacity:0;
+  filter:brightness(.28) saturate(.68) contrast(1.16);
+  transform:scale(1.025);
+  transition:opacity .65s ease;
+}
+
+.dance-background.is-ready video{opacity:1;}
+
+.dance-background-wash{
+  position:fixed;
+  top:var(--site-header-height);
+  left:0;
+  width:100vw;
+  height:calc(100vh - var(--site-header-height));
+  background:
+    linear-gradient(180deg, rgba(12,8,5,.74), rgba(12,8,5,.58) 42%, rgba(12,8,5,.82)),
+    linear-gradient(90deg, rgba(9,6,4,.52), transparent 48%, rgba(9,6,4,.44));
+}
+
+.dance-background-glow{
+  position:fixed;
+  width:34vw;
+  height:34vw;
+  min-width:280px;
+  min-height:280px;
+  border-radius:50%;
+  filter:blur(90px);
+  opacity:.13;
+  background:var(--amber);
+  pointer-events:none;
+}
+.dance-background-glow-one{top:20%; left:-12%;}
+.dance-background-glow-two{right:-14%; bottom:4%; background:var(--hazard); opacity:.1;}
+
+.dance-stage-content,
+.dance-stage footer,
+.dance-stage > .hazard{position:relative; z-index:1;}
+
+.dance-stage .ticker{
+  background:rgba(var(--ink-rgb),.78);
+  backdrop-filter:blur(10px);
+  border-color:rgba(var(--amber-rgb),.18);
+}
+
+.dance-stage section.about,
+.dance-stage section.panel-section,
+.dance-stage section.gallery,
+.dance-stage section.book{
+  background:transparent;
+}
+
+.dance-stage section > .wrap{
+  position:relative;
+  padding:clamp(30px,4vw,54px);
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:18px;
+  background:linear-gradient(145deg, rgba(var(--ink-rgb),.79), rgba(36,26,18,.7));
+  box-shadow:
+    0 30px 70px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.045),
+    0 0 42px rgba(var(--amber-rgb),.035);
+  backdrop-filter:blur(12px) saturate(1.08);
+}
+
+.dance-stage section:nth-of-type(even) > .wrap{
+  background:linear-gradient(145deg, rgba(36,26,18,.74), rgba(var(--ink-rgb),.82));
+}
+
+.dance-stage section > .wrap::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:clamp(28px,5vw,70px);
+  right:clamp(28px,5vw,70px);
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(var(--amber-rgb),.48), transparent);
+}
+
+.dance-stage .kicker,
+.dance-stage .eyebrow{color:var(--amber);}
+
+.dance-stage footer{
+  background:rgba(var(--ink-rgb),.82);
+  backdrop-filter:blur(12px);
+  border-top:1px solid rgba(255,255,255,.07);
+}
+
+@media (max-width:700px){
+  .dance-stage section > .wrap{
+    width:calc(100% - 24px);
+    padding:28px 20px;
+    border-radius:14px;
+  }
+}
+
+@media (prefers-reduced-motion:reduce){
+  .dance-background video{display:none;}
+}
