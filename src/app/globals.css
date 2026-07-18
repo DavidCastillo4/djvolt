@@ -1503,11 +1503,12 @@ footer {
 
 .admin-dashboard-shell {
  margin: 0 auto;
+ padding: 0; /* Override the global section padding applied to every <section>. */
  overflow: visible;
 }
 
 .admin-dashboard-header {
- padding: 12px 32px 10px;
+ padding: 8px 32px;
  border-bottom: 1px solid var(--wood-line);
 }
 
@@ -1574,7 +1575,7 @@ footer {
  }
 
  .admin-dashboard-header {
-  padding: 10px 20px 8px;
+  padding: 8px 20px;
  }
 
  .admin-tab-content {
