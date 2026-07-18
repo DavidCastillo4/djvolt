@@ -388,7 +388,8 @@ h1.wordmark span {
 
 .ticker-track {
  display: inline-flex;
- animation: scroll var(--ticker-speed, 32s) linear infinite;
+ width: max-content;
+ will-change: transform;
 }
 
 .ticker-track span {
