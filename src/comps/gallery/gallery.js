@@ -299,27 +299,30 @@ export const Gallery = ({ mediaItems }) => {
     <div className="lightbox open" role="dialog" aria-modal="true" aria-label="Gallery viewer" onClick={(event) => {
      if (event.target === event.currentTarget) closeViewer();
     }}>
-     <button ref={closeButtonRef} type="button" className="lightbox-close" onClick={closeViewer} aria-label="Close gallery viewer">✕</button>
-     {mediaItems.length > 1 && (
-      <>
-       <button type="button" className="lightbox-nav lightbox-prev" onClick={() => changeViewerItem(-1)} aria-label="Previous gallery item">‹</button>
-       <button type="button" className="lightbox-nav lightbox-next" onClick={() => changeViewerItem(1)} aria-label="Next gallery item">›</button>
-      </>
-     )}
      <div className="lightbox-stage" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
-      {selectedItem.type === 'video' ? (
-       <video
-        key={selectedItem.key}
-        className="lightbox-media"
-        src={selectedItem.src}
-        controls
-        autoPlay
-        playsInline
-        preload="metadata"
-       />
-      ) : (
-       <img className="lightbox-media" src={selectedItem.src} alt={selectedItem.name || 'DJ Volts event photo'} />
-      )}
+      <div className={`lightbox-media-frame ${selectedItem.type === 'video' ? 'is-video' : 'is-image'}`}>
+       {selectedItem.type === 'video' ? (
+        <video
+         key={selectedItem.key}
+         className="lightbox-media"
+         src={selectedItem.src}
+         controls
+         autoPlay
+         playsInline
+         preload="metadata"
+        />
+       ) : (
+        <img className="lightbox-media" src={selectedItem.src} alt={selectedItem.name || 'DJ Volts event photo'} />
+       )}
+
+       <button ref={closeButtonRef} type="button" className="lightbox-close" onClick={closeViewer} aria-label="Close gallery viewer">✕</button>
+       {mediaItems.length > 1 && (
+        <>
+         <button type="button" className="lightbox-nav lightbox-prev" onClick={() => changeViewerItem(-1)} aria-label="Previous gallery item">‹</button>
+         <button type="button" className="lightbox-nav lightbox-next" onClick={() => changeViewerItem(1)} aria-label="Next gallery item">›</button>
+        </>
+       )}
+      </div>
      </div>
     </div>
    )}
