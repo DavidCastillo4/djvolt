@@ -1,7 +1,7 @@
 export const Hero = () => (
  <>
   <section className="hero" style={{ padding: '0' }} id="top">
-   <video src="/api/videos/hero" autoPlay muted loop playsInline poster="/assets/images/booth-red.jpg" />
+   <video src="/api/videos/hero" autoPlay muted loop playsInline poster="/api/images/by-name/booth-red.jpg" />
    <div className="hero-inner">
     <span className="eyebrow">
      <span className="dot"></span>

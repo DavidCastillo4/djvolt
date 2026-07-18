@@ -283,10 +283,10 @@
   /*
    * The document already reserves the sticky header through scroll-padding-top.
    * Pull the section itself upward by its internal top padding so the colored
-   * section label lands directly beneath the navbar without exposing a strip
-   * of the previous section.
+   * section label lands just below the navbar without exposing a strip
+   * of the previous section. The 12px remainder gives the label breathing room.
    */
-  section[id]{scroll-margin-top:calc(var(--section-top-padding) * -1);}
+  section[id]{scroll-margin-top:calc(12px - var(--section-top-padding));}
   .section-head{max-width:640px; margin-bottom:56px;}
   .kicker{
     font-family:var(--mono); font-size:0.8rem; letter-spacing:3px; text-transform:uppercase; color:var(--volt);

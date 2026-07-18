@@ -6,7 +6,7 @@ export const About = () => (
    <span className="kicker">The Story</span>
    <div className="about-grid">
     <div className="about-photo">
-     <img src="/assets/images/about-portrait.jpg" alt="DJ Volts working the booth at a live event" />
+     <img src="/api/images/by-name/about-portrait.jpg" alt="DJ Volts working the booth at a live event" />
      <div className="tag">120V &amp; PROUD OF IT</div>
     </div>
     <div className="about-copy">
