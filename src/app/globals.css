@@ -561,8 +561,8 @@
     .breakers{grid-template-columns:repeat(2,1fr);}
   }
   @media (max-width:560px){
-    :root{--site-header-height:141px;}
-    nav{padding-left:16px; padding-right:16px;}
+    :root{--site-header-height:129px;}
+    nav{padding:8px 16px;}
     .brand img.brand-logo{height:112px;}
     .theme-picker select{max-width:118px; font-size:0.68rem; padding-left:8px;}
     .nav-cta{display:none;}
@@ -574,6 +574,27 @@
     .nameplate-grid div:nth-child(2n){border-right:1px solid var(--wood-line);}
     .nameplate-grid div:nth-last-child(-n+2){border-bottom:1px solid var(--wood-line);}
     .nameplate-grid div:last-child{border-bottom:none;}
+  }
+
+
+  /* Compact navigation for phones held horizontally. */
+  @media (orientation:landscape) and (max-height:500px) and (max-width:950px){
+    :root{--site-header-height:152px;}
+    header.site > nav{
+      padding:4px 14px;
+      min-height:152px;
+    }
+    header.site > nav .theme-picker,
+    header.site > nav .nav-cta{display:none;}
+    header.site > nav .brand{margin-right:0;}
+    header.site > nav .menu-btn{
+      display:inline-block;
+      margin-left:auto;
+      padding:7px 10px;
+    }
+    .mobile-menu{padding-left:14px; padding-right:14px;}
+    .mobile-menu.open{padding-bottom:8px;}
+    .mobile-menu a{padding:9px 0;}
   }
 
 
