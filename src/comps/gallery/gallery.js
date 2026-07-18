@@ -5,47 +5,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const AUTO_SCROLL_PIXELS_PER_SECOND = 12;
 
-const MediaCard = ({ item, itemKey, onOpen, shouldPlay }) => {
- const videoRef = useRef(null);
- const cardRef = useRef(null);
-
- useEffect(() => {
-  if (item.type !== 'video') return undefined;
-
-  const video = videoRef.current;
-  const card = cardRef.current;
-  if (!video || !card) return undefined;
-
-  const observer = new IntersectionObserver(
-   ([entry]) => {
-    if (entry.isIntersecting && shouldPlay) {
-     video.play().catch(() => {});
-    } else {
-     video.pause();
-    }
-   },
-   {
-    threshold: 0,
-    // Begin playback just before the card enters the visible screen so mobile
-    // visitors do not see a black frame while the gallery is moving.
-    rootMargin: '0px 25% 0px 25%',
-   },
-  );
-
-  observer.observe(card);
-  return () => {
-   observer.disconnect();
-   video.pause();
-  };
- }, [item.type, shouldPlay]);
-
- useEffect(() => {
-  if (item.type === 'video' && !shouldPlay) videoRef.current?.pause();
- }, [item.type, shouldPlay]);
-
- return (
+const MediaCard = ({ item, itemKey, onOpen }) => (
   <button
-   ref={cardRef}
    type="button"
    className="media-card"
    onClick={() => onOpen(item)}
@@ -54,7 +15,6 @@ const MediaCard = ({ item, itemKey, onOpen, shouldPlay }) => {
   >
    {item.type === 'video' ? (
     <video
-     ref={videoRef}
      src={item.src}
      muted
      loop
@@ -67,8 +27,7 @@ const MediaCard = ({ item, itemKey, onOpen, shouldPlay }) => {
    )}
    <span className="media-card-type" aria-hidden="true">{item.type === 'video' ? '▶' : '⤢'}</span>
   </button>
- );
-};
+);
 
 export const Gallery = ({ mediaItems }) => {
  const [selectedIndex, setSelectedIndex] = useState(null);
@@ -78,6 +37,7 @@ export const Gallery = ({ mediaItems }) => {
  const animationRef = useRef(null);
  const resumeTimerRef = useRef(null);
  const lastFrameTimeRef = useRef(null);
+ const lastPlaybackSyncRef = useRef(0);
  const scrollPositionRef = useRef(0);
  const closeButtonRef = useRef(null);
  const touchStart = useRef({ x: 0, y: 0 });
@@ -90,6 +50,31 @@ export const Gallery = ({ mediaItems }) => {
  const selectedItem = selectedIndex === null ? null : mediaItems[selectedIndex];
  const shouldPlayInline = isPageVisible && selectedIndex === null;
 
+ const syncInlineVideoPlayback = useCallback(() => {
+  const track = trackRef.current;
+  if (!track) return;
+
+  const trackRect = track.getBoundingClientRect();
+  const horizontalBuffer = trackRect.width * 0.25;
+
+  track.querySelectorAll('.media-card video').forEach((video) => {
+   const card = video.closest('.media-card');
+   if (!card) return;
+
+   const cardRect = card.getBoundingClientRect();
+   const isNearViewport = (
+    cardRect.right >= trackRect.left - horizontalBuffer
+    && cardRect.left <= trackRect.right + horizontalBuffer
+   );
+
+   if (shouldPlayInline && isNearViewport) {
+    if (video.paused) video.play().catch(() => {});
+   } else if (!video.paused) {
+    video.pause();
+   }
+  });
+ }, [shouldPlayInline]);
+
 
  useEffect(() => {
   const handleVisibilityChange = () => setIsPageVisible(!document.hidden);
@@ -97,6 +82,24 @@ export const Gallery = ({ mediaItems }) => {
   document.addEventListener('visibilitychange', handleVisibilityChange);
   return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
  }, []);
+
+ useEffect(() => {
+  const track = trackRef.current;
+  if (!track) return undefined;
+
+  const handleMediaReady = () => syncInlineVideoPlayback();
+  const frame = window.requestAnimationFrame(syncInlineVideoPlayback);
+
+  track.addEventListener('loadeddata', handleMediaReady, true);
+  track.addEventListener('canplay', handleMediaReady, true);
+
+  return () => {
+   window.cancelAnimationFrame(frame);
+   track.removeEventListener('loadeddata', handleMediaReady, true);
+   track.removeEventListener('canplay', handleMediaReady, true);
+   track.querySelectorAll('.media-card video').forEach((video) => video.pause());
+  };
+ }, [mediaItems, syncInlineVideoPlayback]);
 
  useEffect(() => {
   const track = trackRef.current;
@@ -109,6 +112,7 @@ export const Gallery = ({ mediaItems }) => {
    if (setWidth > 0) {
     scrollPositionRef.current = setWidth;
     track.scrollLeft = setWidth;
+    window.requestAnimationFrame(syncInlineVideoPlayback);
    }
   };
 
@@ -119,7 +123,7 @@ export const Gallery = ({ mediaItems }) => {
    window.clearTimeout(initialTimer);
    window.removeEventListener('resize', positionAtMiddleSet);
   };
- }, [mediaItems.length]);
+ }, [mediaItems.length, syncInlineVideoPlayback]);
 
  useEffect(() => {
   const track = trackRef.current;
@@ -150,6 +154,11 @@ export const Gallery = ({ mediaItems }) => {
     track.scrollLeft = scrollPositionRef.current;
    }
 
+   if (timestamp - lastPlaybackSyncRef.current >= 250) {
+    lastPlaybackSyncRef.current = timestamp;
+    syncInlineVideoPlayback();
+   }
+
    animationRef.current = window.requestAnimationFrame(animate);
   };
 
@@ -158,7 +167,7 @@ export const Gallery = ({ mediaItems }) => {
    window.cancelAnimationFrame(animationRef.current);
    lastFrameTimeRef.current = null;
   };
- }, [isInteracting, mediaItems.length, selectedIndex]);
+ }, [isInteracting, mediaItems.length, selectedIndex, syncInlineVideoPlayback]);
 
  const getSetWidth = () => {
   const track = trackRef.current;
@@ -183,11 +192,15 @@ export const Gallery = ({ mediaItems }) => {
   }
 
   scrollPositionRef.current = nextPosition;
-  if (track.scrollLeft !== nextPosition) track.scrollLeft = nextPosition;
+  if (track.scrollLeft !== nextPosition) {
+   track.scrollLeft = nextPosition;
+   window.requestAnimationFrame(syncInlineVideoPlayback);
+  }
  };
 
  const pauseThenResume = () => {
   setIsInteracting(true);
+  syncInlineVideoPlayback();
   window.clearTimeout(resumeTimerRef.current);
   resumeTimerRef.current = window.setTimeout(() => setIsInteracting(false), 1400);
  };
@@ -220,6 +233,7 @@ export const Gallery = ({ mediaItems }) => {
 
   scrollPositionRef.current = targetLeft;
   track.scrollTo({ left: targetLeft, behavior: 'smooth' });
+  window.setTimeout(syncInlineVideoPlayback, 350);
  };
 
  useEffect(() => () => window.clearTimeout(resumeTimerRef.current), []);
@@ -306,7 +320,6 @@ export const Gallery = ({ mediaItems }) => {
             item={item}
             itemKey={`${item.key}-${setIndex}-${itemIndex}`}
             onOpen={openItem}
-            shouldPlay={shouldPlayInline}
            />
           ))}
          </div>
