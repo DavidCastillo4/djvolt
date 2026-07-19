@@ -30,10 +30,10 @@ const MediaCard = ({ item, itemKey, onOpen }) => (
 export const Gallery = ({ mediaItems, content }) => {
  const requestedSpeedLevel = Number(content?.scrollSpeed);
  const gallerySpeedLevel = Number.isFinite(requestedSpeedLevel)
-  ? Math.min(20, Math.max(1, Math.round(requestedSpeedLevel)))
+  ? Math.min(50, Math.max(1, Math.round(requestedSpeedLevel)))
   : 5;
  // Level 5 preserves the gallery's original 12 px/second speed.
- // Each step changes the speed by 2 px/second, providing 20 clearly distinct choices.
+ // Each step changes the speed by 2 px/second, providing 50 clearly distinct choices.
  const autoScrollPixelsPerSecond = 2 + (gallerySpeedLevel * 2);
  const [selectedIndex, setSelectedIndex] = useState(null);
  const [isInteracting, setIsInteracting] = useState(false);

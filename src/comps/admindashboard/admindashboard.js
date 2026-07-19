@@ -619,12 +619,13 @@ const TICKER_SPEED_OPTIONS = [
  ['18', 'Very fast'],
 ];
 
-const GALLERY_SPEED_OPTIONS = Array.from({ length: 20 }, (_, index) => {
+const GALLERY_SPEED_OPTIONS = Array.from({ length: 50 }, (_, index) => {
  const level = index + 1;
  let label = `${level}`;
  if (level === 1) label += ' — Slowest';
  if (level === 5) label += ' — Current speed';
- if (level === 20) label += ' — Fastest';
+ if (level === 20) label += ' — Fast';
+ if (level === 50) label += ' — Fastest';
  return [String(level), label];
 });
 
@@ -646,7 +647,7 @@ const ContentField = ({ section, field, value, onChange }) => {
  if (type === 'gallerySpeed') {
   return (
    <label className="content-field content-field-select" htmlFor={id}>
-    <span>{label}<small>1 = slowest, 20 = fastest</small></span>
+    <span>{label}<small>1 = slowest, 50 = fastest</small></span>
     <select id={id} value={String(value ?? '5')} onChange={(e)=>onChange(section,key,e.target.value)}>
      {GALLERY_SPEED_OPTIONS.map(([level, name]) => <option key={level} value={level}>{name}</option>)}
     </select>
