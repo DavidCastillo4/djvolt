@@ -604,7 +604,7 @@ const CONTENT_FIELDS = {
  ticker: [['items','Scrolling genres (separate with |)',220,true],['speed','Scrolling speed',0,false,'speed']],
  about: [['kicker','Section label',30],['photoTag','Photo label',35],['heading','Heading',120,true],['paragraph','Story paragraph',420,true],['plateTitle','Nameplate title',35],['plateModel','Model label',35],...Array.from({length:6},(_,i)=>[[`label${i+1}`,`Specification ${i+1} label`,28],[`value${i+1}`,`Specification ${i+1} value`,45]]).flat()],
  services: [['kicker','Section label',30],['heading','Heading',100],['intro','Introduction',260,true],['panelTitle','Panel title',45],['powerLabel','Power label',24],...Array.from({length:4},(_,i)=>[[`service${i+1}Title`,`Service ${i+1} name`,35],[`service${i+1}Description`,`Service ${i+1} description`,220,true]]).flat()],
- gallery: [['kicker','Section label',30],['heading','Heading',90],['intro','Introduction',220,true]],
+ gallery: [['kicker','Section label',30],['heading','Heading',90],['intro','Introduction',220,true],['scrollSpeed','Gallery scrolling speed',0,false,'gallerySpeed']],
  booking: [['kicker','Section label',30],['heading','Heading',90],['intro','Introduction',280,true],['phone','Phone number',28],['email','Email address',80],['instagram','Instagram label',40],['ticketTitle','Ticket title',35],['ticketCode','Ticket code',30],...Array.from({length:5},(_,i)=>[[`row${i+1}Label`,`Ticket row ${i+1} label`,35],[`row${i+1}Value`,`Ticket row ${i+1} value`,45]]).flat()],
  footer: [['brandTop','Brand line 1',12],['brandBottom','Brand line 2',12],['about','About link',18],['services','Services link',18],['gallery','Gallery link',18],['book','Book link',18]],
 };
@@ -619,6 +619,15 @@ const TICKER_SPEED_OPTIONS = [
  ['18', 'Very fast'],
 ];
 
+const GALLERY_SPEED_OPTIONS = Array.from({ length: 20 }, (_, index) => {
+ const level = index + 1;
+ let label = `${level}`;
+ if (level === 1) label += ' — Slowest';
+ if (level === 5) label += ' — Current speed';
+ if (level === 20) label += ' — Fastest';
+ return [String(level), label];
+});
+
 const ContentField = ({ section, field, value, onChange }) => {
  const [key,label,max,multiline,type] = field;
  const id = `content-${section}-${key}`;
@@ -629,6 +638,17 @@ const ContentField = ({ section, field, value, onChange }) => {
     <span>{label}<small>Lower seconds = faster</small></span>
     <select id={id} value={String(value ?? '32')} onChange={(e)=>onChange(section,key,e.target.value)}>
      {TICKER_SPEED_OPTIONS.map(([seconds, name]) => <option key={seconds} value={seconds}>{name} — {seconds} seconds</option>)}
+    </select>
+   </label>
+  );
+ }
+
+ if (type === 'gallerySpeed') {
+  return (
+   <label className="content-field content-field-select" htmlFor={id}>
+    <span>{label}<small>1 = slowest, 20 = fastest</small></span>
+    <select id={id} value={String(value ?? '5')} onChange={(e)=>onChange(section,key,e.target.value)}>
+     {GALLERY_SPEED_OPTIONS.map(([level, name]) => <option key={level} value={level}>{name}</option>)}
     </select>
    </label>
   );

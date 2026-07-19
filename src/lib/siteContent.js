@@ -25,7 +25,7 @@ export const DEFAULT_SITE_CONTENT = {
   service3Title: 'Bars & Breweries', service3Description: 'Line dance nights, live trivia breaks, and sets that keep a bar crowd on their feet until close.',
   service4Title: 'Corporate & Company', service4Description: 'Company parties and events with clean sound, tasteful lighting, and a set list that fits the crowd.'
  },
- gallery: { kicker: 'Gallery', heading: 'From the booth & dance floor', intro: 'Photos and live footage from recent sets — click any moment to see it full size.' },
+ gallery: { kicker: 'Gallery', heading: 'From the booth & dance floor', intro: 'Photos and live footage from recent sets — click any moment to see it full size.', scrollSpeed: '5' },
  booking: {
   kicker: 'Booking', heading: "Let's wire up your event", intro: "Reach out with your date, venue and headcount, and you'll get a straight answer on availability and pricing — no runaround.",
   phone: '(512) 557-5987', email: 'info@djvolts.com', instagram: '@djvolts2025',

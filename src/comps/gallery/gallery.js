@@ -3,8 +3,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-const AUTO_SCROLL_PIXELS_PER_SECOND = 12;
-
 const MediaCard = ({ item, itemKey, onOpen }) => (
   <button
    type="button"
@@ -30,6 +28,13 @@ const MediaCard = ({ item, itemKey, onOpen }) => (
 );
 
 export const Gallery = ({ mediaItems, content }) => {
+ const requestedSpeedLevel = Number(content?.scrollSpeed);
+ const gallerySpeedLevel = Number.isFinite(requestedSpeedLevel)
+  ? Math.min(20, Math.max(1, Math.round(requestedSpeedLevel)))
+  : 5;
+ // Level 5 preserves the gallery's original 12 px/second speed.
+ // Each step changes the speed by 2 px/second, providing 20 clearly distinct choices.
+ const autoScrollPixelsPerSecond = 2 + (gallerySpeedLevel * 2);
  const [selectedIndex, setSelectedIndex] = useState(null);
  const [isInteracting, setIsInteracting] = useState(false);
  const [isPageVisible, setIsPageVisible] = useState(true);
@@ -145,7 +150,7 @@ export const Gallery = ({ mediaItems, content }) => {
    lastFrameTimeRef.current = timestamp;
 
    if (setWidth > 0) {
-    scrollPositionRef.current += AUTO_SCROLL_PIXELS_PER_SECOND * elapsedSeconds;
+    scrollPositionRef.current += autoScrollPixelsPerSecond * elapsedSeconds;
 
     if (scrollPositionRef.current >= setWidth * 2) {
      scrollPositionRef.current -= setWidth;
@@ -167,7 +172,7 @@ export const Gallery = ({ mediaItems, content }) => {
    window.cancelAnimationFrame(animationRef.current);
    lastFrameTimeRef.current = null;
   };
- }, [isInteracting, mediaItems.length, selectedIndex, syncInlineVideoPlayback]);
+ }, [autoScrollPixelsPerSecond, isInteracting, mediaItems.length, selectedIndex, syncInlineVideoPlayback]);
 
  const getSetWidth = () => {
   const track = trackRef.current;
