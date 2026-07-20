@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useState } from 'react';
 
 export const Hero = ({ content, mediaSettings }) => {
@@ -8,7 +9,7 @@ export const Hero = ({ content, mediaSettings }) => {
  const enableHeroPoster = mediaSettings?.enableHeroPoster ?? true;
 
  return <><section className={`hero${videoReady ? ' hero-video-ready' : ''}`} style={{ padding: 0 }} id="top">
-  {!enableHeroVideo && enableHeroPoster && <img className="hero-fallback" src="/api/posters/hero" alt="" aria-hidden="true" />}
+  {!enableHeroVideo && enableHeroPoster && <Image className="hero-fallback" src="/api/posters/hero" alt="" aria-hidden="true" fill sizes="100vw" unoptimized />}
   {enableHeroVideo && (
    <video
     src="/api/videos/hero"

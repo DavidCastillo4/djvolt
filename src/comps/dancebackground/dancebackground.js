@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 
 export const DanceBackground = ({ mediaSettings }) => {
@@ -19,7 +20,7 @@ export const DanceBackground = ({ mediaSettings }) => {
 
  return (
   <div className={`dance-background${isReady ? ' is-ready' : ''}`} aria-hidden="true">
-   {!enableBackgroundVideo && enableBackgroundPoster && <img className="dance-background-poster" src="/api/posters/background" alt="" />}
+   {!enableBackgroundVideo && enableBackgroundPoster && <Image className="dance-background-poster" src="/api/posters/background" alt="" fill sizes="100vw" unoptimized />}
    {enableBackgroundVideo && (
     <video
      ref={videoRef}
