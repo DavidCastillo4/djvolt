@@ -39,11 +39,13 @@ export const Gallery = ({ mediaItems, content }) => {
  const [selectedIndex, setSelectedIndex] = useState(null);
  const [isInteracting, setIsInteracting] = useState(false);
  const [isPageVisible, setIsPageVisible] = useState(true);
+ const [isGalleryVisible, setIsGalleryVisible] = useState(true);
+ const gallerySectionRef = useRef(null);
  const trackRef = useRef(null);
  const animationRef = useRef(null);
  const resumeTimerRef = useRef(null);
  const lastFrameTimeRef = useRef(null);
- const lastPlaybackSyncRef = useRef(0);
+ const setWidthRef = useRef(0);
  const scrollPositionRef = useRef(0);
  const closeButtonRef = useRef(null);
  const touchStart = useRef({ x: 0, y: 0 });
@@ -60,26 +62,15 @@ export const Gallery = ({ mediaItems, content }) => {
   const track = trackRef.current;
   if (!track) return;
 
-  const trackRect = track.getBoundingClientRect();
-  const horizontalBuffer = Math.min(90, trackRect.width * 0.08);
-
   track.querySelectorAll('.media-card video').forEach((video) => {
-   const card = video.closest('.media-card');
-   if (!card) return;
-
-   const cardRect = card.getBoundingClientRect();
-   const isNearViewport = (
-    cardRect.right >= trackRect.left - horizontalBuffer
-    && cardRect.left <= trackRect.right + horizontalBuffer
-   );
-
-   if (shouldPlayInline && isNearViewport) {
+   const shouldPlay = shouldPlayInline && isGalleryVisible && video.dataset.nearViewport === 'true';
+   if (shouldPlay) {
     if (video.paused) video.play().catch(() => {});
    } else if (!video.paused) {
     video.pause();
    }
   });
- }, [shouldPlayInline]);
+ }, [isGalleryVisible, shouldPlayInline]);
 
 
  useEffect(() => {
@@ -90,62 +81,87 @@ export const Gallery = ({ mediaItems, content }) => {
  }, []);
 
  useEffect(() => {
+  const section = gallerySectionRef.current;
+  if (!section || !('IntersectionObserver' in window)) return undefined;
+
+  const observer = new IntersectionObserver(([entry]) => {
+   setIsGalleryVisible(entry.isIntersecting);
+  }, { rootMargin: '180px 0px' });
+
+  observer.observe(section);
+  return () => observer.disconnect();
+ }, []);
+
+ useEffect(() => {
   const track = trackRef.current;
   if (!track) return undefined;
 
-  const handleMediaReady = () => syncInlineVideoPlayback();
-  const frame = window.requestAnimationFrame(syncInlineVideoPlayback);
+  const videos = Array.from(track.querySelectorAll('.media-card video'));
+  if (!('IntersectionObserver' in window)) {
+   videos.forEach((video) => { video.dataset.nearViewport = 'true'; });
+   syncInlineVideoPlayback();
+   return () => videos.forEach((video) => video.pause());
+  }
 
-  track.addEventListener('loadeddata', handleMediaReady, true);
-  track.addEventListener('canplay', handleMediaReady, true);
+  const observer = new IntersectionObserver((entries) => {
+   entries.forEach((entry) => {
+    const video = entry.target;
+    video.dataset.nearViewport = entry.isIntersecting ? 'true' : 'false';
+    if (!entry.isIntersecting && !video.paused) video.pause();
+   });
+   syncInlineVideoPlayback();
+  }, { root: track, rootMargin: '0px 90px', threshold: 0.01 });
+
+  videos.forEach((video) => observer.observe(video));
+  syncInlineVideoPlayback();
 
   return () => {
-   window.cancelAnimationFrame(frame);
-   track.removeEventListener('loadeddata', handleMediaReady, true);
-   track.removeEventListener('canplay', handleMediaReady, true);
-   track.querySelectorAll('.media-card video').forEach((video) => video.pause());
+   observer.disconnect();
+   videos.forEach((video) => video.pause());
   };
  }, [mediaItems, syncInlineVideoPlayback]);
 
+
  useEffect(() => {
   const track = trackRef.current;
-  if (!track || mediaItems.length <= 1) return undefined;
+  const firstSet = track?.querySelector('.media-gallery-set');
+  if (!track || !firstSet || mediaItems.length <= 1) return undefined;
 
-  const positionAtMiddleSet = () => {
-   const firstSet = track.querySelector('.media-gallery-set');
-   if (!firstSet) return;
-   const setWidth = firstSet.getBoundingClientRect().width + 16;
-   if (setWidth > 0) {
-    scrollPositionRef.current = setWidth;
-    track.scrollLeft = setWidth;
-    window.requestAnimationFrame(syncInlineVideoPlayback);
+  let initialized = false;
+  const measure = () => {
+   const width = firstSet.getBoundingClientRect().width + 16;
+   if (width <= 0) return;
+   setWidthRef.current = width;
+   if (!initialized) {
+    initialized = true;
+    scrollPositionRef.current = width;
+    track.scrollLeft = width;
    }
+   syncInlineVideoPlayback();
   };
 
-  const initialTimer = window.setTimeout(positionAtMiddleSet, 50);
-  window.addEventListener('resize', positionAtMiddleSet);
+  const frame = window.requestAnimationFrame(measure);
+  const resizeObserver = 'ResizeObserver' in window ? new ResizeObserver(measure) : null;
+  resizeObserver?.observe(firstSet);
+  window.addEventListener('resize', measure, { passive: true });
 
   return () => {
-   window.clearTimeout(initialTimer);
-   window.removeEventListener('resize', positionAtMiddleSet);
+   window.cancelAnimationFrame(frame);
+   resizeObserver?.disconnect();
+   window.removeEventListener('resize', measure);
   };
  }, [mediaItems.length, syncInlineVideoPlayback]);
 
+
  useEffect(() => {
   const track = trackRef.current;
-  if (!track || mediaItems.length <= 1 || isInteracting || selectedIndex !== null) {
+  if (!track || mediaItems.length <= 1 || isInteracting || selectedIndex !== null || !isPageVisible || !isGalleryVisible) {
    lastFrameTimeRef.current = null;
    return undefined;
   }
 
   const animate = (timestamp) => {
-   const firstSet = track.querySelector('.media-gallery-set');
-   if (!firstSet) {
-    animationRef.current = window.requestAnimationFrame(animate);
-    return;
-   }
-
-   const setWidth = firstSet.getBoundingClientRect().width + 16;
+   const setWidth = setWidthRef.current;
    const previousTimestamp = lastFrameTimeRef.current ?? timestamp;
    const elapsedSeconds = Math.min((timestamp - previousTimestamp) / 1000, 0.05);
    lastFrameTimeRef.current = timestamp;
@@ -160,11 +176,6 @@ export const Gallery = ({ mediaItems, content }) => {
     track.scrollLeft = scrollPositionRef.current;
    }
 
-   if (timestamp - lastPlaybackSyncRef.current >= 400) {
-    lastPlaybackSyncRef.current = timestamp;
-    syncInlineVideoPlayback();
-   }
-
    animationRef.current = window.requestAnimationFrame(animate);
   };
 
@@ -173,14 +184,9 @@ export const Gallery = ({ mediaItems, content }) => {
    window.cancelAnimationFrame(animationRef.current);
    lastFrameTimeRef.current = null;
   };
- }, [autoScrollPixelsPerSecond, isInteracting, mediaItems.length, selectedIndex, syncInlineVideoPlayback]);
+ }, [autoScrollPixelsPerSecond, isGalleryVisible, isInteracting, isPageVisible, mediaItems.length, selectedIndex]);
 
- const getSetWidth = () => {
-  const track = trackRef.current;
-  const firstSet = track?.querySelector('.media-gallery-set');
-  if (!track || !firstSet) return 0;
-  return firstSet.getBoundingClientRect().width + 16;
- };
+ const getSetWidth = () => setWidthRef.current;
 
  const maintainEndlessLoop = () => {
   const track = trackRef.current;
@@ -296,7 +302,7 @@ export const Gallery = ({ mediaItems, content }) => {
 
  return (
   <>
-   <section className="gallery" id="gallery">
+   <section ref={gallerySectionRef} className="gallery" id="gallery">
     <div className="wrap">
      <div className="section-head gallery-heading">
       <span className="kicker">{content.kicker}</span>

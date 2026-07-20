@@ -39,7 +39,7 @@ export async function GET(_request, { params }) {
    headers: {
     'Content-Type': 'image/jpeg',
     'Content-Length': String(posterBuffer.length),
-    'Cache-Control': 'no-store',
+    'Cache-Control': 'public, max-age=300, stale-while-revalidate=3600',
    },
   });
  } catch (error) {

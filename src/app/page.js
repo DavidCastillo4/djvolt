@@ -1,8 +1,9 @@
+import { unstable_cache } from 'next/cache';
 import { Djvolts } from '@/comps/djvolts/djvolts';
 import { getDatabase } from '@/lib/db';
 import { DEFAULT_SITE_CONTENT, mergeSiteContent } from '@/lib/siteContent';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 300;
 
 async function getGalleryMedia() {
  try {
@@ -17,16 +18,15 @@ async function getGalleryMedia() {
  } catch (error) { console.error('Unable to load gallery media:', error); return []; }
 }
 
-async function getContent() {
+const getContent = unstable_cache(async function getContent() {
  try {
   const sql = getDatabase();
-  await sql`ALTER TABLE settings ADD COLUMN IF NOT EXISTS content JSONB`;
   const rows = await sql`SELECT content FROM settings ORDER BY settingpk LIMIT 1`;
   return mergeSiteContent(rows[0]?.content || {});
  } catch (error) { console.error('Unable to load content:', error); return DEFAULT_SITE_CONTENT; }
-}
+}, ['djvolts-content'], { revalidate: 300, tags: ['djvolts-content'] });
 
-async function getMediaSettings() {
+const getMediaSettings = unstable_cache(async function getMediaSettings() {
  try {
   const sql = getDatabase();
   const rows = await sql`
@@ -55,7 +55,7 @@ async function getMediaSettings() {
    enableBackgroundPoster: true,
   };
  }
-}
+}, ['djvolts-media-settings'], { revalidate: 300, tags: ['djvolts-media-settings'] });
 
 export default async function Home() {
  const [galleryMedia, content, mediaSettings] = await Promise.all([getGalleryMedia(), getContent(), getMediaSettings()]);

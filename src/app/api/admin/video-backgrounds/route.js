@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 import { ADMIN_COOKIE_NAME, getAdminSessionValue } from '@/lib/adminAuth';
@@ -17,16 +18,6 @@ async function isAuthorized() {
 
 function unauthorized() {
  return NextResponse.json({ message: 'Your admin session has expired.' }, { status: 401 });
-}
-
-async function ensureMediaSettingColumns(sql) {
- await sql`
-  ALTER TABLE settings
-  ADD COLUMN IF NOT EXISTS enableherovideo BOOLEAN NOT NULL DEFAULT TRUE,
-  ADD COLUMN IF NOT EXISTS enablebackgroundvideo BOOLEAN NOT NULL DEFAULT TRUE,
-  ADD COLUMN IF NOT EXISTS enableheroposter BOOLEAN NOT NULL DEFAULT TRUE,
-  ADD COLUMN IF NOT EXISTS enablebackgroundposter BOOLEAN NOT NULL DEFAULT TRUE
- `;
 }
 
 function decodePoster(dataUrl) {
@@ -53,7 +44,6 @@ export async function GET() {
   if (!(await isAuthorized())) return unauthorized();
 
   const sql = getDatabase();
-  await ensureMediaSettingColumns(sql);
 
   const [rows, settingsRows] = await Promise.all([
    sql`
@@ -125,7 +115,6 @@ export async function POST(request) {
   }
 
   const sql = getDatabase();
-  await ensureMediaSettingColumns(sql);
 
   const selectedRows = await sql`
    SELECT vidpk
@@ -167,6 +156,7 @@ export async function POST(request) {
    return NextResponse.json({ message: 'The settings record could not be found.' }, { status: 500 });
   }
 
+  revalidateTag('djvolts-media-settings');
   return NextResponse.json({ success: true });
  } catch (error) {
   console.error('Unable to save video backgrounds:', error);
