@@ -2605,3 +2605,63 @@ footer {
   width: 100%;
  }
 }
+
+/* ---------- phase-one video performance refinements ---------- */
+/* Keep the full-screen video on its own compositor layer without an expensive live blur. */
+.dance-background video,
+.dance-background-poster {
+ backface-visibility: hidden;
+ transform: scale(1.025) translateZ(0);
+ will-change: transform;
+}
+
+.dance-background video {
+ filter: brightness(.5) saturate(1.02) contrast(1.1) sepia(.06);
+}
+
+/* The translucent fill provides readability without repeatedly blurring a moving video. */
+.dance-stage section>.wrap {
+ backdrop-filter: none;
+ -webkit-backdrop-filter: none;
+}
+
+.dance-stage .ticker {
+ backdrop-filter: blur(4px) saturate(1.04);
+ -webkit-backdrop-filter: blur(4px) saturate(1.04);
+}
+
+.dance-stage footer {
+ backdrop-filter: none;
+ -webkit-backdrop-filter: none;
+}
+
+/* Skip layout/paint work for sections that are well outside the viewport. */
+.dance-stage section {
+ content-visibility: auto;
+ contain-intrinsic-size: 760px;
+}
+
+.media-card video {
+ transform: translateZ(0);
+ backface-visibility: hidden;
+}
+
+@media (max-width:700px) {
+ .dance-background video,
+ .dance-background-poster {
+  transform: scale(1.02) translateZ(0);
+ }
+
+ .dance-background video {
+  filter: brightness(.44) saturate(.96) contrast(1.08) sepia(.04);
+ }
+
+ .dance-background-glow {
+  display: none;
+ }
+
+ .dance-stage .ticker {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+ }
+}

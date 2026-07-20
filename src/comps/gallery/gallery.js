@@ -17,7 +17,8 @@ const MediaCard = ({ item, itemKey, onOpen }) => (
      muted
      loop
      playsInline
-     preload="auto"
+     preload="metadata"
+     disablePictureInPicture
      aria-hidden="true"
     />
    ) : (
@@ -60,7 +61,7 @@ export const Gallery = ({ mediaItems, content }) => {
   if (!track) return;
 
   const trackRect = track.getBoundingClientRect();
-  const horizontalBuffer = trackRect.width * 0.25;
+  const horizontalBuffer = Math.min(90, trackRect.width * 0.08);
 
   track.querySelectorAll('.media-card video').forEach((video) => {
    const card = video.closest('.media-card');
@@ -159,7 +160,7 @@ export const Gallery = ({ mediaItems, content }) => {
     track.scrollLeft = scrollPositionRef.current;
    }
 
-   if (timestamp - lastPlaybackSyncRef.current >= 250) {
+   if (timestamp - lastPlaybackSyncRef.current >= 400) {
     lastPlaybackSyncRef.current = timestamp;
     syncInlineVideoPlayback();
    }
