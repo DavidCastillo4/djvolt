@@ -8,6 +8,7 @@ const TABS = [
  { id: 'gallery', label: 'Gallery' },
  { id: 'videos', label: 'Video Backgrounds' },
  { id: 'content', label: 'Content' },
+ { id: 'admin', label: 'Admin' },
 ];
 
 const IMAGE_MAX_BYTES = 4 * 1024 * 1024;
@@ -592,7 +593,7 @@ const VideoBackgroundManager = () => {
         <i aria-hidden="true"></i>
        </label>
        <label className="admin-switch-row">
-        <span><b>Show hero poster image</b><small>Show a still image while the hero video loads, or by itself.</small></span>
+        <span><b>Show hero poster</b><small>Show a still image while the hero video loads, or by itself.</small></span>
         <input type="checkbox" checked={enableHeroPoster} onChange={(event) => setEnableHeroPoster(event.target.checked)} />
         <i aria-hidden="true"></i>
        </label>
@@ -600,12 +601,12 @@ const VideoBackgroundManager = () => {
       <div className="admin-video-display-group">
        <div className="admin-video-display-heading"><strong>Page Background</strong><span>Behind page content</span></div>
        <label className="admin-switch-row">
-        <span><b>Play page-background video</b><small>Do not load the background video when disabled.</small></span>
+        <span><b>Play background video</b><small>Do not load the background video when disabled.</small></span>
         <input type="checkbox" checked={enableBackgroundVideo} onChange={(event) => setEnableBackgroundVideo(event.target.checked)} />
         <i aria-hidden="true"></i>
        </label>
        <label className="admin-switch-row">
-        <span><b>Show page-background poster image</b><small>Show a still image while the background video loads, or by itself.</small></span>
+        <span><b>Show background poster</b><small>Show a still image while the background video loads, or by itself.</small></span>
         <input type="checkbox" checked={enableBackgroundPoster} onChange={(event) => setEnableBackgroundPoster(event.target.checked)} />
         <i aria-hidden="true"></i>
        </label>
@@ -733,6 +734,133 @@ const ContentManager = () => {
  </div>;
 };
 
+
+const AdminManager = () => {
+ const [currentPassword, setCurrentPassword] = useState('');
+ const [newPassword, setNewPassword] = useState('');
+ const [confirmPassword, setConfirmPassword] = useState('');
+ const [saving, setSaving] = useState(false);
+ const [message, setMessage] = useState('');
+ const [error, setError] = useState('');
+
+ useEffect(() => {
+  if (!message) return undefined;
+  const timer = window.setTimeout(() => setMessage(''), 3200);
+  return () => window.clearTimeout(timer);
+ }, [message]);
+
+ useEffect(() => {
+  if (!error) return undefined;
+  const timer = window.setTimeout(() => setError(''), 5000);
+  return () => window.clearTimeout(timer);
+ }, [error]);
+
+ const savePassword = async (event) => {
+  event.preventDefault();
+  setMessage('');
+  setError('');
+
+  if (!currentPassword) {
+   setError('Enter the current password.');
+   return;
+  }
+  if (!newPassword) {
+   setError('Enter a new password.');
+   return;
+  }
+  if (newPassword.length > 50) {
+   setError('The password must be 50 characters or fewer.');
+   return;
+  }
+  if (newPassword !== confirmPassword) {
+   setError('The new passwords do not match.');
+   return;
+  }
+  if (newPassword === currentPassword) {
+   setError('Choose a new password that is different from the current password.');
+   return;
+  }
+
+  setSaving(true);
+  try {
+   const response = await fetch('/api/admin/password', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currentPassword, newPassword }),
+   });
+   const data = await response.json();
+   if (!response.ok) throw new Error(data.message || 'Unable to change the password.');
+
+   setCurrentPassword('');
+   setNewPassword('');
+   setConfirmPassword('');
+   setMessage('Admin password changed successfully.');
+  } catch (saveError) {
+   setError(saveError.message);
+  } finally {
+   setSaving(false);
+  }
+ };
+
+ return (
+  <div className="admin-account-manager">
+   <div className="admin-gallery-toolbar">
+    <div>
+     <h2>Admin</h2>
+     <p>Change the password used to access the admin dashboard.</p>
+    </div>
+   </div>
+
+   {message && <div className="admin-gallery-toast" role="status" aria-live="polite">{message}</div>}
+   {error && <div className="admin-gallery-toast error" role="alert" aria-live="assertive">{error}</div>}
+
+   <form className="admin-password-card" onSubmit={savePassword}>
+    <label htmlFor="admin-current-password">
+     <span>Current password</span>
+     <input
+      id="admin-current-password"
+      type="password"
+      value={currentPassword}
+      maxLength={50}
+      autoComplete="current-password"
+      disabled={saving}
+      onChange={(event) => setCurrentPassword(event.target.value)}
+     />
+    </label>
+    <label htmlFor="admin-new-password">
+     <span>New password</span>
+     <input
+      id="admin-new-password"
+      type="password"
+      value={newPassword}
+      maxLength={50}
+      autoComplete="new-password"
+      disabled={saving}
+      onChange={(event) => setNewPassword(event.target.value)}
+     />
+    </label>
+    <label htmlFor="admin-confirm-password">
+     <span>Confirm new password</span>
+     <input
+      id="admin-confirm-password"
+      type="password"
+      value={confirmPassword}
+      maxLength={50}
+      autoComplete="new-password"
+      disabled={saving}
+      onChange={(event) => setConfirmPassword(event.target.value)}
+     />
+    </label>
+    <div className="admin-password-actions">
+     <button type="submit" className="admin-save-order" disabled={saving}>
+      {saving ? 'Changing password…' : 'Change password'}
+     </button>
+    </div>
+   </form>
+  </div>
+ );
+};
+
 export const AdminDashboard = () => {
  const [activeTab, setActiveTab] = useState('gallery');
 
@@ -770,6 +898,7 @@ export const AdminDashboard = () => {
      {activeTab === 'gallery' && <GalleryManager />}
      {activeTab === 'videos' && <VideoBackgroundManager />}
      {activeTab === 'content' && <ContentManager />}
+     {activeTab === 'admin' && <AdminManager />}
     </div>
    </section>
   </main>

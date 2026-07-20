@@ -2542,3 +2542,66 @@ footer {
  .admin-switch-row { grid-template-columns: minmax(0, 1fr) 62px; gap: 10px; }
  .admin-switch-row small { display: none; }
 }
+
+.admin-account-manager {
+ display: grid;
+ gap: 22px;
+}
+
+.admin-password-card {
+ width: min(100%, 560px);
+ display: grid;
+ gap: 18px;
+ padding: 24px;
+ border: 1px solid var(--wood-line);
+ border-radius: 10px;
+ background: rgba(26, 14, 7, .48);
+}
+
+.admin-password-card label {
+ display: grid;
+ gap: 8px;
+}
+
+.admin-password-card label > span {
+ color: var(--cream);
+ font-weight: 600;
+}
+
+.admin-password-card input {
+ width: 100%;
+ min-height: 46px;
+ padding: 10px 12px;
+ border: 1px solid rgba(255, 255, 255, .15);
+ border-radius: 7px;
+ color: var(--cream);
+ background: rgba(0, 0, 0, .35);
+ font: inherit;
+ outline: none;
+}
+
+.admin-password-card input:focus {
+ border-color: var(--amber);
+ box-shadow: 0 0 0 3px rgba(var(--amber-rgb), .14);
+}
+
+.admin-password-card input:disabled {
+ opacity: .65;
+ cursor: not-allowed;
+}
+
+.admin-password-actions {
+ display: flex;
+ justify-content: flex-end;
+ padding-top: 4px;
+}
+
+@media (max-width: 560px) {
+ .admin-password-card {
+  padding: 18px 16px;
+ }
+
+ .admin-password-actions .admin-save-order {
+  width: 100%;
+ }
+}
