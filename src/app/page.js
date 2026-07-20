@@ -26,7 +26,38 @@ async function getContent() {
  } catch (error) { console.error('Unable to load content:', error); return DEFAULT_SITE_CONTENT; }
 }
 
+async function getMediaSettings() {
+ try {
+  const sql = getDatabase();
+  const rows = await sql`
+   SELECT
+    COALESCE(enableherovideo, TRUE) AS enableherovideo,
+    COALESCE(enablebackgroundvideo, TRUE) AS enablebackgroundvideo,
+    COALESCE(enableheroposter, TRUE) AS enableheroposter,
+    COALESCE(enablebackgroundposter, TRUE) AS enablebackgroundposter
+   FROM settings
+   ORDER BY settingpk
+   LIMIT 1
+  `;
+  const row = rows[0] || {};
+  return {
+   enableHeroVideo: row.enableherovideo ?? true,
+   enableBackgroundVideo: row.enablebackgroundvideo ?? true,
+   enableHeroPoster: row.enableheroposter ?? true,
+   enableBackgroundPoster: row.enablebackgroundposter ?? true,
+  };
+ } catch (error) {
+  console.error('Unable to load media settings:', error);
+  return {
+   enableHeroVideo: true,
+   enableBackgroundVideo: true,
+   enableHeroPoster: true,
+   enableBackgroundPoster: true,
+  };
+ }
+}
+
 export default async function Home() {
- const [galleryMedia, content] = await Promise.all([getGalleryMedia(), getContent()]);
- return <Djvolts galleryMedia={galleryMedia} content={content} />;
+ const [galleryMedia, content, mediaSettings] = await Promise.all([getGalleryMedia(), getContent(), getMediaSettings()]);
+ return <Djvolts galleryMedia={galleryMedia} content={content} mediaSettings={mediaSettings} />;
 }

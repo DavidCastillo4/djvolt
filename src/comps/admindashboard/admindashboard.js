@@ -461,6 +461,10 @@ const VideoBackgroundManager = () => {
  const [videos, setVideos] = useState([]);
  const [heroId, setHeroId] = useState(null);
  const [backgroundId, setBackgroundId] = useState(null);
+ const [enableHeroVideo, setEnableHeroVideo] = useState(true);
+ const [enableBackgroundVideo, setEnableBackgroundVideo] = useState(true);
+ const [enableHeroPoster, setEnableHeroPoster] = useState(true);
+ const [enableBackgroundPoster, setEnableBackgroundPoster] = useState(true);
  const [loading, setLoading] = useState(true);
  const [saving, setSaving] = useState(false);
  const [message, setMessage] = useState('');
@@ -479,6 +483,10 @@ const VideoBackgroundManager = () => {
    setVideos(nextVideos);
    setHeroId(nextVideos.find((video) => video.isHero)?.id ?? null);
    setBackgroundId(nextVideos.find((video) => video.isBackground)?.id ?? null);
+   setEnableHeroVideo(data.settings?.enableHeroVideo ?? true);
+   setEnableBackgroundVideo(data.settings?.enableBackgroundVideo ?? true);
+   setEnableHeroPoster(data.settings?.enableHeroPoster ?? true);
+   setEnableBackgroundPoster(data.settings?.enableBackgroundPoster ?? true);
   } catch (loadError) {
    setError(loadError.message);
   } finally {
@@ -528,7 +536,16 @@ const VideoBackgroundManager = () => {
    const response = await fetch('/api/admin/video-backgrounds', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ heroId, backgroundId, heroPoster, backgroundPoster }),
+    body: JSON.stringify({
+     heroId,
+     backgroundId,
+     heroPoster,
+     backgroundPoster,
+     enableHeroVideo,
+     enableBackgroundVideo,
+     enableHeroPoster,
+     enableBackgroundPoster,
+    }),
    });
    const data = await response.json();
    if (!response.ok) throw new Error(data.message || 'Unable to save the video backgrounds.');
@@ -538,7 +555,7 @@ const VideoBackgroundManager = () => {
     isHero: video.id === heroId,
     isBackground: video.id === backgroundId,
    })));
-   setMessage('Video backgrounds and poster images saved.');
+   setMessage('Video background settings saved.');
   } catch (saveError) {
    setError(saveError.message);
   } finally {
@@ -562,6 +579,40 @@ const VideoBackgroundManager = () => {
 
    {message && <div className="admin-gallery-toast" role="status" aria-live="polite">{message}</div>}
    {error && <div className="admin-gallery-toast error" role="alert" aria-live="assertive">{error}</div>}
+
+   {!loading && (
+    <section className="admin-video-display-settings" aria-labelledby="video-display-settings-title">
+     <h3 id="video-display-settings-title">Video Display Settings</h3>
+     <div className="admin-video-display-columns">
+      <div className="admin-video-display-group">
+       <div className="admin-video-display-heading"><strong>Hero</strong><span>Top of homepage</span></div>
+       <label className="admin-switch-row">
+        <span><b>Play hero video</b><small>Do not load the hero video when disabled.</small></span>
+        <input type="checkbox" checked={enableHeroVideo} onChange={(event) => setEnableHeroVideo(event.target.checked)} />
+        <i aria-hidden="true"></i>
+       </label>
+       <label className="admin-switch-row">
+        <span><b>Show hero poster image</b><small>Show a still image while the hero video loads, or by itself.</small></span>
+        <input type="checkbox" checked={enableHeroPoster} onChange={(event) => setEnableHeroPoster(event.target.checked)} />
+        <i aria-hidden="true"></i>
+       </label>
+      </div>
+      <div className="admin-video-display-group">
+       <div className="admin-video-display-heading"><strong>Page Background</strong><span>Behind page content</span></div>
+       <label className="admin-switch-row">
+        <span><b>Play page-background video</b><small>Do not load the background video when disabled.</small></span>
+        <input type="checkbox" checked={enableBackgroundVideo} onChange={(event) => setEnableBackgroundVideo(event.target.checked)} />
+        <i aria-hidden="true"></i>
+       </label>
+       <label className="admin-switch-row">
+        <span><b>Show page-background poster image</b><small>Show a still image while the background video loads, or by itself.</small></span>
+        <input type="checkbox" checked={enableBackgroundPoster} onChange={(event) => setEnableBackgroundPoster(event.target.checked)} />
+        <i aria-hidden="true"></i>
+       </label>
+      </div>
+     </div>
+    </section>
+   )}
 
    {loading ? (
     <div className="admin-gallery-loading">Loading videos…</div>

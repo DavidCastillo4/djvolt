@@ -36,21 +36,36 @@ function decodePoster(dataUrl) {
  return poster;
 }
 
+const asBoolean = (value, fallback = true) => typeof value === 'boolean' ? value : fallback;
+
 export async function GET() {
  try {
   if (!(await isAuthorized())) return unauthorized();
 
   const sql = getDatabase();
-  const rows = await sql`
-   SELECT
-    vidpk,
-    sortid,
-    COALESCE(ishero, FALSE) AS ishero,
-    COALESCE(isbackground, FALSE) AS isbackground
-   FROM vid
-   ORDER BY sortid, vidpk
-  `;
+  const [rows, settingsRows] = await Promise.all([
+   sql`
+    SELECT
+     vidpk,
+     sortid,
+     COALESCE(ishero, FALSE) AS ishero,
+     COALESCE(isbackground, FALSE) AS isbackground
+    FROM vid
+    ORDER BY sortid, vidpk
+   `,
+   sql`
+    SELECT
+     COALESCE(enableherovideo, TRUE) AS enableherovideo,
+     COALESCE(enablebackgroundvideo, TRUE) AS enablebackgroundvideo,
+     COALESCE(enableheroposter, TRUE) AS enableheroposter,
+     COALESCE(enablebackgroundposter, TRUE) AS enablebackgroundposter
+    FROM settings
+    ORDER BY settingpk
+    LIMIT 1
+   `,
+  ]);
 
+  const settings = settingsRows[0] || {};
   return NextResponse.json({
    videos: rows.map((row) => ({
     id: Number(row.vidpk),
@@ -59,6 +74,12 @@ export async function GET() {
     isBackground: Boolean(row.isbackground),
     src: `/api/videos/id/${row.vidpk}`,
    })),
+   settings: {
+    enableHeroVideo: settings.enableherovideo ?? true,
+    enableBackgroundVideo: settings.enablebackgroundvideo ?? true,
+    enableHeroPoster: settings.enableheroposter ?? true,
+    enableBackgroundPoster: settings.enablebackgroundposter ?? true,
+   },
   });
  } catch (error) {
   console.error('Unable to load video backgrounds:', error);
@@ -73,6 +94,10 @@ export async function POST(request) {
   const body = await request.json();
   const heroId = Number(body.heroId);
   const backgroundId = Number(body.backgroundId);
+  const enableHeroVideo = asBoolean(body.enableHeroVideo);
+  const enableBackgroundVideo = asBoolean(body.enableBackgroundVideo);
+  const enableHeroPoster = asBoolean(body.enableHeroPoster);
+  const enableBackgroundPoster = asBoolean(body.enableBackgroundPoster);
 
   if (!Number.isInteger(heroId) || heroId < 1 || !Number.isInteger(backgroundId) || backgroundId < 1) {
    return NextResponse.json({ message: 'Choose both a hero video and a page-background video.' }, { status: 400 });
@@ -99,9 +124,6 @@ export async function POST(request) {
    return NextResponse.json({ message: 'One of the selected videos no longer exists.' }, { status: 404 });
   }
 
-  // Clear the existing selections first. The hero and background columns use
-  // partial unique indexes, so trying to move TRUE from one row to another in
-  // a single UPDATE can temporarily violate those indexes.
   await sql`
    UPDATE vid
    SET ishero = FALSE,
@@ -119,7 +141,11 @@ export async function POST(request) {
   const updatedSettings = await sql`
    UPDATE settings
    SET heroposter = ${heroPoster},
-       backgroundposter = ${backgroundPoster}
+       backgroundposter = ${backgroundPoster},
+       enableherovideo = ${enableHeroVideo},
+       enablebackgroundvideo = ${enableBackgroundVideo},
+       enableheroposter = ${enableHeroPoster},
+       enablebackgroundposter = ${enableBackgroundPoster}
    RETURNING settingpk
   `;
 
@@ -130,6 +156,6 @@ export async function POST(request) {
   return NextResponse.json({ success: true });
  } catch (error) {
   console.error('Unable to save video backgrounds:', error);
-  return NextResponse.json({ message: 'Unable to save the video-background selections.' }, { status: 500 });
+  return NextResponse.json({ message: 'Unable to save the video-background settings.' }, { status: 500 });
  }
 }

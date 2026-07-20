@@ -1,9 +1,26 @@
 'use client';
+
 import { useState } from 'react';
-export const Hero = ({ content }) => {
+
+export const Hero = ({ content, mediaSettings }) => {
  const [videoReady, setVideoReady] = useState(false);
+ const enableHeroVideo = mediaSettings?.enableHeroVideo ?? true;
+ const enableHeroPoster = mediaSettings?.enableHeroPoster ?? true;
+
  return <><section className={`hero${videoReady ? ' hero-video-ready' : ''}`} style={{ padding: 0 }} id="top">
-  <video src="/api/videos/hero" poster="/api/posters/hero" autoPlay muted loop playsInline preload="auto" onCanPlay={() => setVideoReady(true)} />
+  {!enableHeroVideo && enableHeroPoster && <img className="hero-fallback" src="/api/posters/hero" alt="" aria-hidden="true" />}
+  {enableHeroVideo && (
+   <video
+    src="/api/videos/hero"
+    {...(enableHeroPoster ? { poster: '/api/posters/hero' } : {})}
+    autoPlay
+    muted
+    loop
+    playsInline
+    preload="auto"
+    onCanPlay={() => setVideoReady(true)}
+   />
+  )}
   <div className="hero-inner"><span className="eyebrow"><span className="dot"></span>{content.eyebrow}</span>
    <h1 className="wordmark">{content.titleTop}<br /><span>{content.titleBottom}</span></h1>
    <p className="tagline">{content.tagline}</p>
