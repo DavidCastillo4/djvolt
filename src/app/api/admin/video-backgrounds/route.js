@@ -19,6 +19,16 @@ function unauthorized() {
  return NextResponse.json({ message: 'Your admin session has expired.' }, { status: 401 });
 }
 
+async function ensureMediaSettingColumns(sql) {
+ await sql`
+  ALTER TABLE settings
+  ADD COLUMN IF NOT EXISTS enableherovideo BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS enablebackgroundvideo BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS enableheroposter BOOLEAN NOT NULL DEFAULT TRUE,
+  ADD COLUMN IF NOT EXISTS enablebackgroundposter BOOLEAN NOT NULL DEFAULT TRUE
+ `;
+}
+
 function decodePoster(dataUrl) {
  if (typeof dataUrl !== 'string' || !dataUrl.startsWith(JPEG_DATA_URL_PREFIX)) {
   throw new Error('A valid JPEG poster was not supplied.');
@@ -43,6 +53,8 @@ export async function GET() {
   if (!(await isAuthorized())) return unauthorized();
 
   const sql = getDatabase();
+  await ensureMediaSettingColumns(sql);
+
   const [rows, settingsRows] = await Promise.all([
    sql`
     SELECT
@@ -113,6 +125,8 @@ export async function POST(request) {
   }
 
   const sql = getDatabase();
+  await ensureMediaSettingColumns(sql);
+
   const selectedRows = await sql`
    SELECT vidpk
    FROM vid
