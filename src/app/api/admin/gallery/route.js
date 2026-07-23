@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 
 import { ADMIN_COOKIE_NAME, getAdminSessionValue } from '@/lib/adminAuth';
 import { getDatabase } from '@/lib/db';
@@ -170,7 +171,8 @@ export async function POST(request) {
    `;
   }
 
-  return NextResponse.json({ success: true, uploaded: 1 });
+  revalidatePath('/');
+   return NextResponse.json({ success: true, uploaded: 1 });
  } catch (error) {
   console.error('Unable to upload gallery media:', error);
   return NextResponse.json({ message: 'Unable to upload the selected media.' }, { status: 500 });
@@ -199,6 +201,7 @@ export async function PATCH(request) {
     await sql`UPDATE vid SET isgallery = ${isGallery} WHERE vidpk = ${id}`;
    }
 
+   revalidatePath('/');
    return NextResponse.json({ success: true });
   }
 
@@ -236,6 +239,7 @@ export async function PATCH(request) {
     }
    }
 
+   revalidatePath('/');
    return NextResponse.json({ success: true });
   }
 
